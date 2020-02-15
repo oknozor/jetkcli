@@ -1,0 +1,6 @@
+/target
+/.idea
+**/*.rs.bk
+../config
+../curls
+init.sh
