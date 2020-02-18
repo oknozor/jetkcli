@@ -45,7 +45,7 @@ impl<'a> Jira<'a> {
             host,
         }
     }
-    pub fn get_open_issues(&self) -> String {
+    pub fn get_open_issues(&self) -> Result<String, reqwest::Error> {
         let jql = jql::Query {
             terms: vec![],
             final_term: jql::Pair {
@@ -68,11 +68,10 @@ impl<'a> Jira<'a> {
             .post(&format!("https://{}/{}", self.host, SEARCH))
             .basic_auth(&self.credentials.username, self.credentials.pass())
             .json(&query)
-            .send()
-            .unwrap()
+            .send()?
             .json();
 
-        response.unwrap().to_page()
+        response.map(|response| response.to_page())
     }
 
     pub fn get_all_projects(&self) -> Result<Vec<Project>, reqwest::Error> {
@@ -80,8 +79,7 @@ impl<'a> Jira<'a> {
             .client
             .get(&format!("https://{}{}", self.host, PROJECT))
             .basic_auth(&self.credentials.username, self.credentials.pass())
-            .send()
-            .unwrap()
+            .send()?
             .json()
     }
 
@@ -90,8 +88,7 @@ impl<'a> Jira<'a> {
             .client
             .get(&format!("https://{}{}/{}", self.host, PROJECT, project_name))
             .basic_auth(&self.credentials.username, self.credentials.pass())
-            .send()
-            .unwrap()
+            .send()?
             .json()
     }
 }

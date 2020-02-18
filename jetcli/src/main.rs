@@ -9,9 +9,9 @@ use jet_config::global::GlobalSettings;
 use clap::{App, SubCommand, Arg};
 use jet::jira::Jira;
 use jet::jira::Credentials;
-use jet::command;
 use jet::command::init::InitCommand;
 use jet::command::JetCommand;
+use jet::command::log::LogCommand;
 
 fn main() {
     let settings = GlobalSettings::new().expect("Unable to find jetlib config file");
@@ -57,8 +57,7 @@ fn main() {
         .get_matches();
 
     if let Some(_matches) = matches.subcommand_matches("issues") {
-        let issues = &mut jira.get_open_issues();
-        command::log::run(issues);
+        LogCommand.execute(&mut jira).unwrap();
     } else if let Some(init) = matches.subcommand_matches("init") {
         let project_name = init.value_of("project").unwrap();
         let server_name = init.value_of("server").unwrap();

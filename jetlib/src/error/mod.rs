@@ -72,7 +72,7 @@ impl From<ConfigAlreadyExist> for JetError {
 
 
 #[derive(Debug)]
-pub struct ConfigAlreadyExist;
+pub struct ConfigAlreadyExist {}
 
 impl fmt::Display for ConfigAlreadyExist {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -87,6 +87,6 @@ impl Error for ConfigAlreadyExist {
     }
 
     fn cause(&self) -> Option<&dyn Error> {
-        Some(&ConfigAlreadyExist)
+        Some(&ConfigAlreadyExist {})
     }
 }

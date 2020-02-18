@@ -33,7 +33,7 @@ impl InitCommand {
 
     fn maybe_init_already() -> Result<(), ConfigAlreadyExist> {
         if Path::new("./.jet").exists() {
-            Err(ConfigAlreadyExist)
+            Err(ConfigAlreadyExist{})
         } else {
             Ok(())
         }
