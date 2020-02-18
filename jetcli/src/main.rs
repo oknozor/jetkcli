@@ -1,14 +1,15 @@
 extern crate clap;
 
-use clap::{App, SubCommand, Arg};
-use jet::jira::Jira;
-use jet::jira::Credentials;
-use jet::command::init::InitCommand;
-use jet::command::JetCommand;
-use jet::command::log::LogCommand;
-use jet::settings::local::ProjectSettings;
-use jet::settings::global::GlobalSettings;
+use clap::{App, Arg, SubCommand};
 
+use jet::command::commit::CommitCommand;
+use jet::command::init::InitCommand;
+use jet::command::issues::ListIssuesCommand;
+use jet::command::{JetCommand, JetJiraCommand};
+use jet::jira::Credentials;
+use jet::jira::Jira;
+use jet::settings::global::GlobalSettings;
+use jet::settings::local::ProjectSettings;
 
 fn main() {
     let settings = GlobalSettings::new().unwrap();
@@ -23,11 +24,15 @@ fn main() {
         password: server.password.to_owned(),
     };
 
-    // Generate preformated commit commands
+    // Generate pre-formatted commit commands
     let commit_types = if let Ok(settings) = ProjectSettings::new() {
-        Some(settings.commit_types.iter()
-            .map(|prefix| SubCommand::with_name(&prefix))
-            .collect())
+        Some(
+            settings
+                .commit_types
+                .iter()
+                .map(|prefix| SubCommand::with_name(&prefix))
+                .collect(),
+        )
     } else {
         None
     };
@@ -47,28 +52,45 @@ fn main() {
                         .short("p")
                         .takes_value(true)
                         .help("Project name in Jira")
-                        .required(true)
+                        .required(true),
                 )
                 .arg(
                     Arg::with_name("server")
                         .long("server")
                         .short("s")
                         .takes_value(true)
-                        .help("remote server name in the global jet config file")
-                        .required(true)
+                        .help("remote server name in the global .jet config file")
+                        .required(true),
                 )
                 .about("init")
-                .help("Init a jet project inside a git repository")
+                .help("Init a .jet project inside a git repository"),
         )
         .subcommand(SubCommand::with_name("issues").about("display all ongoing issues"))
         .get_matches();
 
-    if let Some(_matches) = matches.subcommand_matches("issues") {
-        LogCommand.execute(&mut jira).unwrap();
-    } else if let Some(init) = matches.subcommand_matches("init") {
-        let project_name = init.value_of("project").unwrap();
-        let server_name = init.value_of("server").unwrap();
-        InitCommand::new(project_name, server_name)
-            .execute(&mut jira).unwrap();
+    let _ = ProjectSettings::new().unwrap();
+
+    if let Ok(settings) = ProjectSettings::new() {
+        settings.commit_types.iter().for_each(|prefix| {
+            if let Some(_arg) = matches.subcommand_matches(&prefix) {
+                let commit_command = CommitCommand {
+                    prefix: "placeholder".to_string(),
+                    message: "placeholder".to_string(),
+                    scope: "placeholder".to_string(),
+                };
+
+                commit_command.execute().unwrap();
+            }
+        })
+    } else {
+        if let Some(_matches) = matches.subcommand_matches("issues") {
+            ListIssuesCommand.execute(&mut jira).unwrap();
+        } else if let Some(init) = matches.subcommand_matches("init") {
+            let project_name = init.value_of("project").unwrap();
+            let server_name = init.value_of("server").unwrap();
+            InitCommand::new(project_name, server_name)
+                .execute(&mut jira)
+                .unwrap();
+        }
     }
 }
