@@ -1,20 +1,17 @@
-#[macro_use]
-extern crate serde_derive;
-extern crate serde;
 extern crate clap;
 
-mod jet_config;
-
-use jet_config::global::GlobalSettings;
 use clap::{App, SubCommand, Arg};
 use jet::jira::Jira;
 use jet::jira::Credentials;
 use jet::command::init::InitCommand;
 use jet::command::JetCommand;
 use jet::command::log::LogCommand;
+use jet::settings::local::ProjectSettings;
+use jet::settings::global::GlobalSettings;
+
 
 fn main() {
-    let settings = GlobalSettings::new().expect("Unable to find jetlib config file");
+    let settings = GlobalSettings::new().unwrap();
 
     let server = settings
         .servers
@@ -26,12 +23,22 @@ fn main() {
         password: server.password.to_owned(),
     };
 
+    // Generate preformated commit commands
+    let commit_types = if let Ok(settings) = ProjectSettings::new() {
+        Some(settings.commit_types.iter()
+            .map(|prefix| SubCommand::with_name(&prefix))
+            .collect())
+    } else {
+        None
+    };
+
     let mut jira = Jira::new(credentials, &server.url);
 
     let matches = App::new("Jet")
         .version("0.1")
         .author("Paul D. <paul.delafosse@protonmail.com>")
         .about("Jira kung fu client")
+        .subcommands(commit_types.unwrap_or(vec![SubCommand::with_name("commit")]))
         .subcommand(
             SubCommand::with_name("init")
                 .arg(

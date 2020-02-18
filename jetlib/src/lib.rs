@@ -8,3 +8,4 @@ pub mod jira;
 pub mod command;
 pub mod githost;
 pub mod error;
+pub mod settings;
