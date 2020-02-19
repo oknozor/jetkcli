@@ -2,42 +2,36 @@ extern crate clap;
 
 use clap::{App, Arg, SubCommand};
 
-use jet::command::commit::CommitCommand;
-use jet::command::init::InitCommand;
-use jet::command::issues::ListIssuesCommand;
-use jet::command::{JetCommand, JetJiraCommand};
-use jet::jira::Credentials;
-use jet::jira::Jira;
-use jet::settings::global::GlobalSettings;
-use jet::settings::local::ProjectSettings;
+use jetlib::command::commit::CommitCommand;
+use jetlib::command::init::InitCommand;
+use jetlib::command::issues::ListIssuesCommand;
+use jetlib::command::{JetCommand, JetJiraCommand};
+use jetlib::jira::Jira;
+use jetlib::settings::local::ProjectSettingsShared;
+use jetlib::settings::PROJECT_SETTINGS_SHARED;
+use jetlib::settings::GLOBAL_SETTINGS;
+use std::borrow::BorrowMut;
 
 fn main() {
-    let settings = GlobalSettings::new().unwrap();
-
-    let server = settings
-        .servers
-        .get("ineat")
-        .expect(&format!("server {} does not exist in your config", "gl"));
-
-    let credentials = Credentials {
-        username: server.username.to_owned(),
-        password: server.password.to_owned(),
-    };
-
     // Generate pre-formatted commit commands
-    let commit_types = if let Ok(settings) = ProjectSettings::new() {
+    let commit_types = if let Ok(settings) = ProjectSettingsShared::get() {
         Some(
             settings
                 .commit_types
                 .iter()
-                .map(|prefix| SubCommand::with_name(&prefix))
-                .collect(),
+                .map(|prefix|
+                    SubCommand::with_name(&prefix)
+                        .help("Create a pre-formatted according to your jet config file")
+                        .arg(Arg::with_name("message")
+                            .help("The commit message"))
+                        .arg(Arg::with_name("scope")
+                            .help("The scope of th e commit message")))
+                .collect()
         )
     } else {
         None
     };
 
-    let mut jira = Jira::new(credentials, &server.url);
 
     let matches = App::new("Jet")
         .version("0.1")
@@ -59,20 +53,20 @@ fn main() {
                         .long("server")
                         .short("s")
                         .takes_value(true)
-                        .help("remote server name in the global .jet config file")
+                        .help("remote server name in the global .jetcli config file")
                         .required(true),
                 )
                 .about("init")
-                .help("Init a .jet project inside a git repository"),
+                .help("Init a .jetcli project inside a git repository"),
         )
         .subcommand(SubCommand::with_name("issues").about("display all ongoing issues"))
         .get_matches();
 
-    let _ = ProjectSettings::new().unwrap();
 
-    if let Ok(settings) = ProjectSettings::new() {
+    if let Ok(settings) = ProjectSettingsShared::get() {
         settings.commit_types.iter().for_each(|prefix| {
             if let Some(_arg) = matches.subcommand_matches(&prefix) {
+
                 let commit_command = CommitCommand {
                     prefix: "placeholder".to_string(),
                     message: "placeholder".to_string(),
@@ -83,14 +77,25 @@ fn main() {
             }
         })
     } else {
+
+
         if let Some(_matches) = matches.subcommand_matches("issues") {
-            ListIssuesCommand.execute(&mut jira).unwrap();
+
+            // We need the http client
+            let host = &PROJECT_SETTINGS_SHARED.server_url;
+            let credentials = GLOBAL_SETTINGS.current_credentials();
+            let mut  jira = Jira::new(credentials, host);
+
+            ListIssuesCommand.execute(jira.borrow_mut()).unwrap();
         } else if let Some(init) = matches.subcommand_matches("init") {
-            let project_name = init.value_of("project").unwrap();
-            let server_name = init.value_of("server").unwrap();
+
+            let project_name = init.value_of("project").unwrap_or("unwraped");
+            let server_name = init.value_of("server").unwrap_or("unwraped");
+
             InitCommand::new(project_name, server_name)
-                .execute(&mut jira)
+                .execute()
                 .unwrap();
+
         }
     }
 }

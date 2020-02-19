@@ -1,6 +1,9 @@
 mod jql;
 mod search;
 
+use crate::settings::PROJECT_SETTINGS_SHARED;
+use crate::settings::GLOBAL_SETTINGS;
+
 use jql::*;
 use reqwest;
 use search::Search;
@@ -8,17 +11,17 @@ use search::*;
 
 pub mod model;
 
+use model::project::Project;
 use model::response::IssueSearch;
 use model::ToPage;
-use model::project::Project;
 
 const PROJECT: &str = "/rest/api/2/project";
 const SEARCH: &str = "/rest/api/2/search";
 
-pub struct Jira<'a> {
+pub struct Jira {
     pub client: reqwest::Client,
     pub credentials: Credentials,
-    pub host: &'a str,
+    pub host: String,
 }
 
 pub struct Credentials {
@@ -37,8 +40,10 @@ impl Credentials {
     }
 }
 
-impl<'a> Jira<'a> {
+impl Jira {
     pub fn new(credentials: Credentials, host: &str) -> Jira {
+        let host = host.into();
+
         Jira {
             client: reqwest::Client::new(),
             credentials,
@@ -54,7 +59,7 @@ impl<'a> Jira<'a> {
                 operator: Operator::Eq,
             },
         }
-            .to_string();
+        .to_string();
 
         let query = Search {
             jql,
@@ -75,8 +80,7 @@ impl<'a> Jira<'a> {
     }
 
     pub fn get_all_projects(&self) -> Result<Vec<Project>, reqwest::Error> {
-        self
-            .client
+        self.client
             .get(&format!("https://{}{}", self.host, PROJECT))
             .basic_auth(&self.credentials.username, self.credentials.pass())
             .send()?
@@ -84,9 +88,11 @@ impl<'a> Jira<'a> {
     }
 
     pub fn get_project(&self, project_name: &str) -> Result<Project, reqwest::Error> {
-        self
-            .client
-            .get(&format!("https://{}{}/{}", self.host, PROJECT, project_name))
+        self.client
+            .get(&format!(
+                "https://{}{}/{}",
+                self.host, PROJECT, project_name
+            ))
             .basic_auth(&self.credentials.username, self.credentials.pass())
             .send()?
             .json()

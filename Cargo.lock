@@ -570,21 +570,22 @@ checksum = "b8b7a7c0c47db5545ed3fef7468ee7bb5b74691498139e4b3f6a20685dc6dd8e"
 name = "jet"
 version = "0.1.0"
 dependencies = [
+ "clap",
+ "jetlib",
+]
+
+[[package]]
+name = "jetlib"
+version = "0.1.0"
+dependencies = [
  "config",
  "git2",
+ "lazy_static",
  "moins",
  "reqwest",
  "serde 1.0.104",
  "serde_derive",
  "serde_json",
-]
-
-[[package]]
-name = "jetcli"
-version = "0.1.0"
-dependencies = [
- "clap",
- "jet",
  "toml",
 ]
 

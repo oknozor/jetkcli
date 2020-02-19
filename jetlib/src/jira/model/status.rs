@@ -29,11 +29,7 @@ impl Status {
 
 impl ToPage for Status {
     fn to_page(&self) -> String {
-        format!(
-            "Status : {}\n{}",
-            self.name,
-            self.status_category.to_page()
-        )
+        format!("Status : {}\n{}", self.name, self.status_category.to_page())
     }
 }
 
@@ -49,10 +45,6 @@ impl StatusCategory {
 
 impl ToPage for StatusCategory {
     fn to_page(&self) -> String {
-        format!(
-            "Status description : {}",
-            self.name,
-        )
+        format!("Status description : {}", self.name,)
     }
 }
-

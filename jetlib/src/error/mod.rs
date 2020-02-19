@@ -1,6 +1,6 @@
-use std::{io, env};
-use std::fmt;
 use std::error::Error;
+use std::fmt;
+use std::{env, io};
 
 #[derive(Debug)]
 pub enum JetError {
@@ -8,17 +8,21 @@ pub enum JetError {
     ConfigAlreadyExist(ConfigAlreadyExist),
     NotAGitRepository(git2::Error),
     JiraResourceNotFound(reqwest::Error),
-    Other
+    TomlError(toml::ser::Error),
+    Other,
 }
 
 impl fmt::Display for JetError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
-            JetError::ConfigAlreadyExist(ref cause) => write!(f, "Config already exist : {}", cause),
+            JetError::ConfigAlreadyExist(ref cause) => {
+                write!(f, "Config already exist : {}", cause)
+            }
             JetError::ConfigNotFound(ref cause) => write!(f, "Config file not found : {}", cause),
             JetError::NotAGitRepository(ref cause) => write!(f, "Current dir is not a git repository : {}", cause),
             JetError::JiraResourceNotFound(ref cause) => write!(f, "Error fetching resource from jira : {}", cause),
-            JetError::Other=> write!(f, "Unknown Jet error"),
+            JetError::TomlError(ref cause) => write!(f, "Error during config serialization: {}", cause),
+            JetError::Other => write!(f, "Unknown Jet error"),
         }
     }
 }
@@ -30,7 +34,8 @@ impl Error for JetError {
             JetError::ConfigAlreadyExist(ref cause) => cause.description(),
             JetError::NotAGitRepository(ref cause) => cause.description(),
             JetError::JiraResourceNotFound(ref cause) => cause.description(),
-            JetError::Other => "Unknown jet error!",
+            JetError::TomlError(ref cause) => cause.description(),
+            JetError::Other => "Unknown .jetcli error!",
         }
     }
 
@@ -40,6 +45,7 @@ impl Error for JetError {
             JetError::ConfigAlreadyExist(ref cause) => Some(cause),
             JetError::NotAGitRepository(ref cause) => Some(cause),
             JetError::JiraResourceNotFound(ref cause) => Some(cause),
+            JetError::TomlError(ref cause) => Some(cause),
             JetError::Other => None,
         }
     }
@@ -63,13 +69,17 @@ impl From<reqwest::Error> for JetError {
     }
 }
 
-
 impl From<ConfigAlreadyExist> for JetError {
     fn from(cause: ConfigAlreadyExist) -> JetError {
         JetError::ConfigAlreadyExist(cause)
     }
 }
 
+impl From<toml::ser::Error> for JetError {
+    fn from(cause: toml::ser::Error) -> JetError {
+        JetError::TomlError(cause)
+    }
+}
 
 #[derive(Debug)]
 pub struct ConfigAlreadyExist {}
@@ -83,7 +93,7 @@ impl fmt::Display for ConfigAlreadyExist {
 
 impl Error for ConfigAlreadyExist {
     fn description(&self) -> &str {
-        "Cannot override existing jet config"
+        "Cannot override existing .jetcli config"
     }
 
     fn cause(&self) -> Option<&dyn Error> {

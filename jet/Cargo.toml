@@ -1,5 +1,5 @@
 [package]
-name = "jetcli"
+name = "jet"
 version = "0.1.0"
 authors = ["Paul Delafosse <paul.delafosse@protonmail.com>"]
 edition = "2018"
@@ -8,5 +8,4 @@ edition = "2018"
 
 [dependencies]
 clap = "2.33.0"
-jet = {path = "../jetlib"}
-toml = "0.5.6"
+jetlib = {path = "../jetlib"}

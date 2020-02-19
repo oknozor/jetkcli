@@ -1,15 +1,16 @@
+use std::collections::HashMap;
+
 use moins::Color;
 use moins::Moins;
 use moins::PagerOptions;
-use std::collections::HashMap;
-use crate::command::JetCommand;
-use crate::jira::Jira;
+
+use crate::command::JetJiraCommand;
 use crate::error::JetError;
+use crate::jira::Jira;
 
+pub struct ListIssuesCommand;
 
-pub struct LogCommand;
-
-impl JetCommand for LogCommand {
+impl JetJiraCommand for ListIssuesCommand {
     fn execute(&self, client: &mut Jira) -> Result<(), JetError> {
         let mut colors = HashMap::new();
         colors.insert("Description :".to_owned(), Color::LightBlue);
