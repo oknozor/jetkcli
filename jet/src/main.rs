@@ -25,10 +25,13 @@ fn main() {
                         .arg(Arg::with_name("message")
                             .help("The commit message"))
                         .arg(Arg::with_name("scope")
+                            .short("s")
+                            .long("scope")
                             .help("The scope of th e commit message")))
                 .collect()
         )
     } else {
+        println!("no local conf");
         None
     };
 
@@ -65,12 +68,16 @@ fn main() {
 
     if let Ok(settings) = ProjectSettingsShared::get() {
         settings.commit_types.iter().for_each(|prefix| {
-            if let Some(_arg) = matches.subcommand_matches(&prefix) {
+            if let Some(args) = matches.subcommand_matches(&prefix) {
+
+                let message = args.value_of("message").unwrap().to_string();
+                let scope = args.value_of("scope").map(|scope| scope.to_string());
+                let prefix = prefix.to_owned();
 
                 let commit_command = CommitCommand {
-                    prefix: "placeholder".to_string(),
-                    message: "placeholder".to_string(),
-                    scope: "placeholder".to_string(),
+                    message,
+                    scope,
+                    prefix,
                 };
 
                 commit_command.execute().unwrap();
