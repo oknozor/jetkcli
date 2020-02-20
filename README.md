@@ -1,108 +1,82 @@
 # Jetcli
 Jira Embedded Terminal Client
 
-Jet goal is to provide an opinionated cli to automate jira and git task.
+Jet is a strongly opinionated cli to automate jira and git task.
 
-### Features
+**Please don't rush into installing and using jet before you understand why and how to use it. Take time to read this 
+section, this might save you some precious time.** 
 
-#### Configuration
+## Shall I use Jet ? 
 
-- `$XDG_DESKTOP_HOME/jet.toml` 
+Jet is intended to work on a very specific context : 
+- You are working with git and want to enforce naming conventions for branches and commits.
+- You are working with Jira, and wants to get some repeating/boring tasks automated.
 
-##### Global config
+If your project doesn't match this description you probably don't want to use Jet (and won't be able to anyway). 
 
-```toml
-[my_jira_server]
-url = "my-jira-server.example.org"
-username = "me@example.org"
+## What Jet can do for me ? 
 
-[another_one]
-url = "another-jira-server.example.org"
-username = "jira-server@example.org"
-```
+1. When working on a project developers often try to enforce several good practices regarding commit messages, 
+branching model Jira flow etc. Unfortunately people, come and go, and we humans do mistakes.
 
+2. When working with Jira we do a lot of repeating tasks that matches an action we have already done in git. For
+instance, I am working on a project where I have to assign a jira issue to the same reviewer every time I submit a PR
+for this issue. 
 
-The global jet configuration contains a list of jira server and their credentials. For obvious security reasons it is 
-not stored in the working repository. The `[server_name]` value is used to access credentials and ask the cli to 
-perform task on a specific server.
-
-For instance if you want to initialize a project on `my_jira_server` you would use the following : 
-```sh
-jet init --project my_project --server my_jira_server
-```
-
-Or the short version :
-```sh
-jet init -p project my_project -s my_jira_server
-```
-
-However if your global config contains only one server entry your can skip the `--server` argument : 
-```sh 
-jet init my_project
-```
-
-We will get back to this later but remember that `jet init` will contact the provided jira server's rest api and ensure your
-project exists. The init command also expect to be run inside an existing repository.
-
-This would produce an error.
-```sh 
-jet init oops
-```
-
-##### Project settings 
-
-Once your project is initialized your should see a `.jet` directory containing two config files. `config.toml` contains 
-your personal settings and `config.shared.toml`. 
-
-`.jet/config.toml`
-```toml
-# jira user name of your default reviewers
-reviewers = ["john doe", "michel dupont", "alice white"]
-# user to assign your completed issues
-default_assignee =  "kevin the techlead"
-```
-
-`.jet/config.shared.toml`
-```toml
-# define your branches prefixes
-server_url = "my-jira-server.example.org"
-# branch prefix convention
-branch_types = ["fix", "feat", "chore", "style", "doc"]
-# commit prefix convention
-commit_types = ["fix", "feat", "chore", "style", "doc"]
-# branch prefix separator : `feat/some-feature`
-branch_separator = "/"
-```
-
-All settings in the shared config can be edited and shared with your team.
+Jet provide a higher level abstraction which allow you to perform tasks on both git objects and jira issues. 
+It enforce a branching model and a commit message convention referencing your issues.
+It would be pointless to respect such conventions if it was not to generate pretty change logs. So Jet allows you to 
+generate change logs too.
 
 
-
-#### Design 
-
-Jet does less than you think. It  mostly uses git to automate some stuff in jira workflow, the core features are the following :
-
-- [ ] starting a fresh issue with automated branch name. 
-- [ ] transitioning jira issue state and assignment on picking and resolving issues.
-- [ ] automated jira time tracking
-- [ ] assigning people for review/validation when pushing fixes/features
+## Configuration
+### Global settings
+### Project settings
+### Shared Project settings
 
 
-#### Starting a project 
+### TODOs
 
-1. In a git repository : `jet init ${servername} -p project_name`
+- [x] init command
+- [ ] template commit command
+    - [x] generate commit prefix from config
+    - [x] git2 implementation
+    - [ ] current jira issue
+- [ ] install commit hooks
+    - [ ] validate commit message against template
+- [ ] info command
+    - [ ] opt global
+    - [ ] opt local
+- [ ] status command
+    - [ ] show current issue
+    - [ ] show related commits
+    - [ ] show git diff
+- [ ] issues command
+    - [x] open my issues
+    - [ ] opt open
+    - [ ] opt search
+    - [ ] opt user
+- [ ] checkout command
+    - [ ] fetch issue
+    - [ ] if not assign issue to the current user 
+    - [ ] create and checkout branch from template
+    - [ ] change issue state to ${WIP}
+- [ ] submit command
+    - [ ] create a new PR on the remote git platform
+    - [ ] assign reviewers
+    - [ ] assign jira issues default reporter
+    - [ ] support bitbucket
+    - [ ] support github
+    - [ ] support gitlab
+    - [ ] opt wip
+    - [ ] unwip by default
+- [ ] open command 
+    - [ ] open jira issue in the browser
+    - [ ] opt `--git` to open pull request page
+- [ ] changelogs command
+    - [ ] default from previous tag
+    - [ ] opt --from 
+    - [ ] opt --to  
 
-#### Command
-
-- `jet init --project {project_name} -s {server_name}`
-- `jet issues`
-- `jet issues --all`
-- `jet issues --search {text}`
-- `jet issues --name {issue_name}`
-- `jet checkout {issue_name}`
-- `jet pr`
-- `jet open`
-- `jet open --name {issue_name}`
-- `jet show users`
-- `jet status`
-- `jet config`
+### Command doc
+TODO
