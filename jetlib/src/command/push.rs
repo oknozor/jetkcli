@@ -5,7 +5,7 @@ use crate::jira::Jira;
 pub struct PushCommand;
 
 impl JetJiraCommand for PushCommand {
-    fn execute(&self, client: &mut Jira) -> Result<(), JetError> {
+    fn execute(&self, _: &mut Jira) -> Result<(), JetError> {
         unimplemented!()
     }
 }

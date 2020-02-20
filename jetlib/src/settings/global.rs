@@ -1,13 +1,14 @@
 use std::collections::HashMap;
-use std::env;
 
 use config::Config;
 use config::ConfigError;
 use config::File;
+use dirs;
 
 use crate::jira::Credentials;
 
 use super::PROJECT_SETTINGS_SHARED;
+use std::path::PathBuf;
 
 #[derive(Debug, Deserialize)]
 pub struct GlobalSettings {
@@ -19,6 +20,30 @@ pub struct Server {
     pub url: String,
     pub username: String,
     pub password: String,
+}
+
+impl GlobalSettings {
+    pub fn get() -> Result<Self, ConfigError> {
+        let path = Self::path();
+
+        if path.exists() {
+            let mut s = Config::new();
+            s.merge(File::from(path))?;
+            s.try_into()
+        } else {
+            Err(ConfigError::NotFound(
+                "Unable to find home directory".into(),
+            ))
+        }
+    }
+
+    fn path() -> PathBuf {
+        let mut config_path = dirs::config_dir()
+            .unwrap_or_else(|| panic!("unable to local XDG_CONFIG directory!"));
+        config_path.push(".jet");
+        config_path.push("config.toml");
+        config_path
+    }
 }
 
 impl GlobalSettings {
@@ -42,27 +67,13 @@ impl GlobalSettings {
         let server_name = PROJECT_SETTINGS_SHARED.server_name.clone();
         self.servers.get(&server_name).unwrap().as_credentials()
     }
-
-    pub fn get() -> Result<Self, ConfigError> {
-        let home = env::var("HOME");
-        if let Ok(home) = home {
-            let config_path = format!("{}/.config/jet/config.toml", home);
-            let mut s = Config::new();
-            s.merge(File::with_name(&config_path))?;
-            s.try_into()
-        } else {
-            Err(ConfigError::NotFound(
-                "Unable to find home directory".into(),
-            ))
-        }
-    }
 }
 
 impl Server {
     fn as_credentials(&self) -> Credentials {
         Credentials {
             username: self.username.clone(),
-            password: self.username.clone(),
+            password: self.password.clone(),
         }
     }
 }

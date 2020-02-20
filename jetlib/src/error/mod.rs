@@ -7,6 +7,7 @@ pub enum JetError {
     ConfigNotFound(io::Error),
     ConfigAlreadyExist(ConfigAlreadyExist),
     NotAGitRepository(git2::Error),
+    EmptyIndex,
     JiraResourceNotFound(reqwest::Error),
     TomlError(toml::ser::Error),
     Other,
@@ -20,6 +21,7 @@ impl fmt::Display for JetError {
             }
             JetError::ConfigNotFound(ref cause) => write!(f, "Config file not found : {}", cause),
             JetError::NotAGitRepository(ref cause) => write!(f, "Current dir is not a git repository : {}", cause),
+            JetError::EmptyIndex => write!(f, "nothing added to commit but untracked files present (use \"git add\" to track)"),
             JetError::JiraResourceNotFound(ref cause) => write!(f, "Error fetching resource from jira : {}", cause),
             JetError::TomlError(ref cause) => write!(f, "Error during config serialization: {}", cause),
             JetError::Other => write!(f, "Unknown Jet error"),
@@ -33,6 +35,7 @@ impl Error for JetError {
             JetError::ConfigNotFound(ref cause) => cause.description(),
             JetError::ConfigAlreadyExist(ref cause) => cause.description(),
             JetError::NotAGitRepository(ref cause) => cause.description(),
+            JetError::EmptyIndex => "nothing added to commit but untracked files present (use \"git add\" to track)",
             JetError::JiraResourceNotFound(ref cause) => cause.description(),
             JetError::TomlError(ref cause) => cause.description(),
             JetError::Other => "Unknown .jetcli error!",
@@ -47,6 +50,7 @@ impl Error for JetError {
             JetError::JiraResourceNotFound(ref cause) => Some(cause),
             JetError::TomlError(ref cause) => Some(cause),
             JetError::Other => None,
+            JetError::EmptyIndex => None
         }
     }
 }

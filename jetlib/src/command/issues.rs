@@ -24,6 +24,7 @@ impl JetJiraCommand for ListIssuesCommand {
         };
 
         let issues = &mut client.get_open_issues()?;
-        Ok(Moins::run(issues, Some(options)))
+        Moins::run(issues, Some(options));
+        Ok(())
     }
 }
