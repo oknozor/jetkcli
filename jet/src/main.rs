@@ -11,6 +11,7 @@ use jetlib::settings::local::ProjectSettingsShared;
 use jetlib::settings::PROJECT_SETTINGS_SHARED;
 use jetlib::settings::GLOBAL_SETTINGS;
 use std::borrow::BorrowMut;
+use jetlib::command::info::InfoCommand;
 
 fn main() {
     // Generate pre-formatted commit commands
@@ -60,39 +61,51 @@ fn main() {
                 .help("Init a .jetcli project inside a git repository"),
         )
         .subcommand(SubCommand::with_name("issues").about("display all ongoing issues"))
+        .subcommand(SubCommand::with_name("info").about("dump info on the current jet project"))
         .get_matches();
 
+    if let Some(subcommand) = matches.subcommand_name() {
+        match subcommand {
+            "init" => {
+                let init = matches.subcommand_matches("init").unwrap();
+                let project_name = init.value_of("project").unwrap_or("unwraped");
+                let server_name = init.value_of("server");
 
-    if let Ok(settings) = ProjectSettingsShared::get() {
-        settings.commit_types.iter().for_each(|prefix| {
-            if let Some(args) = matches.subcommand_matches(&prefix) {
-                let message = args.value_of("message").unwrap().to_string();
-                let scope = args.value_of("scope").map(|scope| scope.to_string());
-                let prefix = prefix.to_owned();
-
-                let commit_command = CommitCommand {
-                    message,
-                    scope,
-                    prefix,
-                };
-
-                commit_command.execute().unwrap();
+                InitCommand::new(project_name, server_name)
+                    .execute()
+                    .unwrap();
             }
-        })
-    } else if let Some(_matches) = matches.subcommand_matches("issues") {
+            "info" => {
+                InfoCommand
+                    .execute()
+                    .unwrap()
+            }
+            "issues" => {
+                // We need the http client
+                let host = &PROJECT_SETTINGS_SHARED.server_url;
+                let credentials = GLOBAL_SETTINGS.current_credentials();
+                let mut jira = Jira::new(credentials, host);
 
-        // We need the http client
-        let host = &PROJECT_SETTINGS_SHARED.server_url;
-        let credentials = GLOBAL_SETTINGS.current_credentials();
-        let mut jira = Jira::new(credentials, host);
+                ListIssuesCommand.execute(jira.borrow_mut()).unwrap();
+            }
+            _other => {
+                let settings = ProjectSettingsShared::get().unwrap();
+                settings.commit_types.iter().for_each(|prefix| {
+                    if let Some(args) = matches.subcommand_matches(&prefix) {
+                        let message = args.value_of("message").unwrap().to_string();
+                        let scope = args.value_of("scope").map(|scope| scope.to_string());
+                        let prefix = prefix.to_owned();
 
-        ListIssuesCommand.execute(jira.borrow_mut()).unwrap();
-    } else if let Some(init) = matches.subcommand_matches("init") {
-        let project_name = init.value_of("project").unwrap_or("unwraped");
-        let server_name = init.value_of("server");
+                        let commit_command = CommitCommand {
+                            message,
+                            scope,
+                            prefix,
+                        };
 
-        InitCommand::new(project_name, server_name)
-            .execute()
-            .unwrap();
-    }
+                        commit_command.execute().unwrap();
+                    }
+                })
+            }
+        }
+    };
 }

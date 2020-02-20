@@ -1,6 +1,6 @@
 use config::{Config, ConfigError, File};
-use std::path::Path;
 use super::GLOBAL_SETTINGS;
+use crate::git::GitRepo;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct ProjectSettingsShared {
@@ -27,10 +27,15 @@ impl ProjectSettings {
     }
 
     pub fn get() -> Result<Self, ConfigError> {
-        let config_path = ".jet/config.toml";
-        if Path::new(config_path).exists() {
+        // FIXME : handle no repo
+        let repo = GitRepo::open().unwrap();
+        let workdir = repo.get_repo_dir().unwrap();
+        let mut config_path = workdir.to_path_buf();
+        config_path.push(".jet/config.toml");
+
+        if config_path.exists() {
             let mut s = Config::new();
-            s.merge(File::with_name(config_path))?;
+            s.merge(File::from(config_path))?;
             s.try_into()
         } else {
             Err(ConfigError::NotFound(
@@ -38,10 +43,6 @@ impl ProjectSettings {
             ))
         }
     }
-
-    // fn path() -> PathBuf {
-    //
-    // }
 }
 
 impl ProjectSettingsShared {
@@ -58,9 +59,12 @@ impl ProjectSettingsShared {
     }
 
     pub fn get() -> Result<Self, ConfigError> {
-        let mut config_path = std::env::current_dir().unwrap();
-        config_path.push(".jet");
-        config_path.push("config.shared.toml");
+        // FIXME : handle no repo
+        let repo = GitRepo::open().unwrap();
+        let workdir = repo.get_repo_dir().unwrap();
+        let mut config_path = workdir.to_path_buf();
+        config_path.push(".jet/config.shared.toml");
+
         if config_path.exists() {
             let mut s = Config::new();
             s.merge(File::from(config_path))?;

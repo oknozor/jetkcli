@@ -6,6 +6,7 @@ pub mod commit;
 pub mod init;
 pub mod issues;
 pub mod push;
+pub mod info;
 
 pub trait JetCommand {
     fn execute(&self) -> Result<(), JetError>;

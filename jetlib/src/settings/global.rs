@@ -3,19 +3,18 @@ use std::collections::HashMap;
 use config::Config;
 use config::ConfigError;
 use config::File;
-use dirs;
 
 use crate::jira::Credentials;
 
 use super::PROJECT_SETTINGS_SHARED;
 use std::path::PathBuf;
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct GlobalSettings {
     pub servers: HashMap<String, Server>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct Server {
     pub url: String,
     pub username: String,
@@ -40,7 +39,7 @@ impl GlobalSettings {
     fn path() -> PathBuf {
         let mut config_path = dirs::config_dir()
             .unwrap_or_else(|| panic!("unable to local XDG_CONFIG directory!"));
-        config_path.push(".jet");
+        config_path.push("jet");
         config_path.push("config.toml");
         config_path
     }

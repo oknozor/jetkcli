@@ -2,7 +2,6 @@ mod jql;
 mod search;
 
 use jql::*;
-use reqwest;
 use search::Search;
 use search::*;
 

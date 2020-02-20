@@ -3,11 +3,11 @@ use crate::error::ConfigAlreadyExist;
 use crate::error::JetError;
 use crate::jira::Jira;
 use crate::settings::GLOBAL_SETTINGS;
-use git2::Repository;
 use std::fs::File;
 use std::io::Write;
 use std::path::Path;
 use crate::settings::local::{ProjectSettingsShared, ProjectSettings};
+use crate::git::GitRepo;
 
 /// Init a .jetcli project inside a git repository
 pub struct InitCommand {
@@ -17,6 +17,7 @@ pub struct InitCommand {
 
 impl JetCommand for InitCommand {
     fn execute(&self) -> Result<(), JetError> {
+        // Use arg `--server` or the default one
         let server_name = if let Some(name) = &self.server_name {
             name
         } else {
@@ -36,9 +37,9 @@ impl JetCommand for InitCommand {
         // - is git repository ?
         // - is a jet project ?
         // - is a valid jira project ?
-        let _ = Repository::open(".")?;
+        let _ = GitRepo::open()?;
         InitCommand::maybe_init_already()?;
-        let _ = jira.get_project(&self.project_name)?; //FIXME
+        let _ = jira.get_project(&self.project_name)?;
 
         // Get server from command or default value from config
         let settings = ProjectSettingsShared::create(&self.project_name, server_name);
