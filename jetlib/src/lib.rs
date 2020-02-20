@@ -7,10 +7,10 @@ extern crate moins;
 extern crate serde;
 extern crate toml;
 
+mod error;
 mod git;
 mod githost;
-mod error;
 
+pub mod command;
 pub mod jira;
 pub mod settings;
-pub mod command;

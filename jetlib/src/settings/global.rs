@@ -37,8 +37,8 @@ impl GlobalSettings {
     }
 
     fn path() -> PathBuf {
-        let mut config_path = dirs::config_dir()
-            .unwrap_or_else(|| panic!("unable to local XDG_CONFIG directory!"));
+        let mut config_path =
+            dirs::config_dir().unwrap_or_else(|| panic!("unable to local XDG_CONFIG directory!"));
         config_path.push("jet");
         config_path.push("config.toml");
         config_path
@@ -76,4 +76,3 @@ impl Server {
         }
     }
 }
-

@@ -1,6 +1,6 @@
-use config::{Config, ConfigError, File};
 use super::GLOBAL_SETTINGS;
 use crate::git::GitRepo;
+use config::{Config, ConfigError, File};
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct ProjectSettingsShared {
@@ -52,8 +52,20 @@ impl ProjectSettingsShared {
             server_url,
             server_name: server_name.into(),
             project_name: project_name.into(),
-            branch_types: vec!["fix".into(), "feat".into(), "chore".into(), "style".into(), "doc".into()],
-            commit_types: vec!["fix".into(), "feat".into(), "chore".into(), "style".into(), "doc".into()],
+            branch_types: vec![
+                "fix".into(),
+                "feat".into(),
+                "chore".into(),
+                "style".into(),
+                "doc".into(),
+            ],
+            commit_types: vec![
+                "fix".into(),
+                "feat".into(),
+                "chore".into(),
+                "style".into(),
+                "doc".into(),
+            ],
             branch_separator: "/".into(),
         }
     }

@@ -1,13 +1,13 @@
 use crate::command::JetCommand;
 use crate::error::ConfigAlreadyExist;
 use crate::error::JetError;
+use crate::git::GitRepo;
 use crate::jira::Jira;
+use crate::settings::local::{ProjectSettings, ProjectSettingsShared};
 use crate::settings::GLOBAL_SETTINGS;
 use std::fs::File;
 use std::io::Write;
 use std::path::Path;
-use crate::settings::local::{ProjectSettingsShared, ProjectSettings};
-use crate::git::GitRepo;
 
 /// Init a .jetcli project inside a git repository
 pub struct InitCommand {
@@ -56,8 +56,7 @@ impl JetCommand for InitCommand {
         let settings = toml::to_string(&settings)?;
         let mut file = File::create(".jet/config.toml")?;
 
-        file.write_all(settings.as_bytes())
-            .map_err(JetError::from)
+        file.write_all(settings.as_bytes()).map_err(JetError::from)
     }
 }
 

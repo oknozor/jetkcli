@@ -3,15 +3,15 @@ extern crate clap;
 use clap::{App, Arg, SubCommand};
 
 use jetlib::command::commit::CommitCommand;
+use jetlib::command::info::InfoCommand;
 use jetlib::command::init::InitCommand;
 use jetlib::command::issues::ListIssuesCommand;
 use jetlib::command::{JetCommand, JetJiraCommand};
 use jetlib::jira::Jira;
 use jetlib::settings::local::ProjectSettingsShared;
-use jetlib::settings::PROJECT_SETTINGS_SHARED;
 use jetlib::settings::GLOBAL_SETTINGS;
+use jetlib::settings::PROJECT_SETTINGS_SHARED;
 use std::borrow::BorrowMut;
-use jetlib::command::info::InfoCommand;
 
 fn main() {
     // Generate pre-formatted commit commands
@@ -20,19 +20,17 @@ fn main() {
             settings
                 .commit_types
                 .iter()
-                .map(|prefix|
+                .map(|prefix| {
                     SubCommand::with_name(&prefix)
                         .help("Create a pre-formatted according to your jet config file")
-                        .arg(Arg::with_name("message")
-                            .help("The commit message"))
-                        .arg(Arg::with_name("scope")
-                            .help("The scope of th e commit message")))
-                .collect()
+                        .arg(Arg::with_name("message").help("The commit message"))
+                        .arg(Arg::with_name("scope").help("The scope of th e commit message"))
+                })
+                .collect(),
         )
     } else {
         None
     };
-
 
     let matches = App::new("Jet")
         .version("0.1")
@@ -75,11 +73,7 @@ fn main() {
                     .execute()
                     .unwrap();
             }
-            "info" => {
-                InfoCommand
-                    .execute()
-                    .unwrap()
-            }
+            "info" => InfoCommand.execute().unwrap(),
             "issues" => {
                 // We need the http client
                 let host = &PROJECT_SETTINGS_SHARED.server_url;

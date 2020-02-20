@@ -56,7 +56,7 @@ impl Jira {
                 operator: Operator::Eq,
             },
         }
-            .to_string();
+        .to_string();
 
         let query = Search {
             jql,
@@ -86,10 +86,7 @@ impl Jira {
 
     pub fn get_project(&self, project_name: &str) -> Result<Project, reqwest::Error> {
         self.client
-            .get(&format!(
-                "{}{}/{}",
-                self.host, PROJECT, project_name
-            ))
+            .get(&format!("{}{}/{}", self.host, PROJECT, project_name))
             .basic_auth(&self.credentials.username, self.credentials.pass())
             .send()?
             .json()

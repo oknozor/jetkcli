@@ -1,7 +1,7 @@
+use config::ConfigError;
 use std::error::Error;
 use std::fmt;
 use std::{env, io};
-use config::ConfigError;
 
 #[derive(Debug)]
 pub enum JetError {
@@ -22,10 +22,19 @@ impl fmt::Display for JetError {
                 write!(f, "Config already exist : {}", cause)
             }
             JetError::FileNotFound(ref cause) => write!(f, "File not found : {}", cause),
-            JetError::NotAGitRepository(ref cause) => write!(f, "Current dir is not a git repository : {}", cause),
-            JetError::EmptyIndex => write!(f, "nothing added to commit but untracked files present (use \"git add\" to track)"),
-            JetError::JiraResourceNotFound(ref cause) => write!(f, "Error fetching resource from jira : {}", cause),
-            JetError::TomlError(ref cause) => write!(f, "Error during config serialization: {}", cause),
+            JetError::NotAGitRepository(ref cause) => {
+                write!(f, "Current dir is not a git repository : {}", cause)
+            }
+            JetError::EmptyIndex => write!(
+                f,
+                "nothing added to commit but untracked files present (use \"git add\" to track)"
+            ),
+            JetError::JiraResourceNotFound(ref cause) => {
+                write!(f, "Error fetching resource from jira : {}", cause)
+            }
+            JetError::TomlError(ref cause) => {
+                write!(f, "Error during config serialization: {}", cause)
+            }
             JetError::Other => write!(f, "Unknown Jet error"),
             JetError::ConfigError(ref cause) => write!(f, "Config error {}", cause),
         }
@@ -38,11 +47,13 @@ impl Error for JetError {
             JetError::FileNotFound(ref cause) => cause.description(),
             JetError::ConfigAlreadyExist(ref cause) => cause.description(),
             JetError::NotAGitRepository(ref cause) => cause.description(),
-            JetError::EmptyIndex => "nothing added to commit but untracked files present (use \"git add\" to track)",
+            JetError::EmptyIndex => {
+                "nothing added to commit but untracked files present (use \"git add\" to track)"
+            }
             JetError::JiraResourceNotFound(ref cause) => cause.description(),
             JetError::TomlError(ref cause) => cause.description(),
             JetError::Other => "Unknown .jetcli error!",
-            JetError::ConfigError(ref cause) => cause.description()
+            JetError::ConfigError(ref cause) => cause.description(),
         }
     }
 
