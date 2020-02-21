@@ -10,6 +10,10 @@ impl JetCommand for InfoCommand {
     fn execute(&self) -> Result<(), JetError> {
         println!("Jet Project info  :");
 
+        let git = GitRepo::open()?;
+        let branch_name = git.get_current_branch_name()?;
+        println!("# On branch {}", branch_name);
+
         match ProjectSettingsShared::get() {
             Ok(ref settings) => {
                 println!("Shared settings \n{}", toml::to_string(settings).unwrap())

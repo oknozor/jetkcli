@@ -63,6 +63,12 @@ impl GitRepo {
             Err(JetError::EmptyIndex)
         }
     }
+    pub fn get_current_branch_name(&self) -> Result<String, JetError> {
+        let head = &self.repo.head()?;
+        let head = head.shorthand();
+        let branch_name = head.unwrap().into();
+        Ok(branch_name)
+    }
 
     fn get_head(&self) -> Option<Object> {
         if let Ok(head) = GitRepo::tree_to_treeish(&self.repo, Some(&"HEAD".to_string())) {

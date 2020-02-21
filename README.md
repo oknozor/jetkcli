@@ -45,6 +45,9 @@ generate change logs too.
 - [ ] install commit hooks
     - [ ] validate commit message against template
 - [ ] info command
+    - [ ] issue state, description and assignee
+    - [x] current branch name
+    - [ ] dump config (ie. without credentials)
     - [ ] opt global
     - [ ] opt local
 - [ ] status command
