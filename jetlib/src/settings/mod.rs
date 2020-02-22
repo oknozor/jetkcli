@@ -1,9 +1,10 @@
 pub mod global;
-pub mod local;
+pub mod private;
+pub mod shared;
 
 use global::GlobalSettings;
-use local::ProjectSettings;
-use local::ProjectSettingsShared;
+use private::ProjectSettings;
+use shared::ProjectSettingsShared;
 
 lazy_static! {
     pub static ref GLOBAL_SETTINGS: GlobalSettings = { GlobalSettings::get().unwrap() };

@@ -30,28 +30,34 @@ generate change logs too.
 
 
 ## Configuration
+TODO
 ### Global settings
-### Project settings
-### Shared Project settings
-
+TODO
+### Private project settings
+TODO
+### Shared project settings
+TODO
 
 ### TODOs
 
 - [x] init command
-- [ ] template commit command
+- [x] template commit command
     - [x] generate commit prefix from config
     - [x] git2 implementation
-    - [ ] current jira issue
+    - [x] current jira issue
+    - [x] optional scope
+    - [x] default behavior for unmapped branch
 - [ ] install commit hooks
     - [ ] validate commit message against template
 - [ ] info command
-    - [ ] issue state, description and assignee
     - [x] current branch name
     - [ ] dump config (ie. without credentials)
     - [ ] opt global
     - [ ] opt local
 - [ ] status command
     - [ ] show current issue
+    - [ ] issue state
+    - [ ] issue description --details
     - [ ] show related commits
     - [ ] show git diff
 - [ ] issues command
@@ -60,9 +66,11 @@ generate change logs too.
     - [ ] opt search
     - [ ] opt user
 - [ ] checkout command
-    - [ ] fetch issue
+    - [x] fetch issue
     - [ ] if not assign issue to the current user 
-    - [ ] create and checkout branch from template
+    - [x] create and checkout branch from template
+    - [x] checkout branch from template
+    - [x] create and checkout branch from template
     - [ ] change issue state to ${WIP}
 - [ ] submit command
     - [ ] create a new PR on the remote git platform

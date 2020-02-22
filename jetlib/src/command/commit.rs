@@ -10,23 +10,38 @@ pub struct CommitCommand {
 
 impl JetCommand for CommitCommand {
     fn execute(&self) -> Result<(), JetError> {
-        let message = if let Some(scope) = &self.scope {
-            format!(
+        let git_repo = GitRepo::open()?;
+        let branch = git_repo.get_current_branch_name()?;
+
+        let issue = super::branch_name_to_issue_key(&branch);
+
+        let message = match (&self.scope, issue.as_ref()) {
+            (Some(scope), Some(issue)) => format!(
                 "{prefix}({scope}): {message} ({issue})",
                 prefix = &self.prefix,
                 scope = scope,
                 message = &self.message,
-                issue = "DUM-01"
-            )
-        } else {
-            format!(
+                issue = issue
+            ),
+            (None, Some(issue)) => format!(
                 "{prefix}: {message} ({issue})",
                 prefix = &self.prefix,
                 message = &self.message,
-                issue = "DUM-01"
-            )
+                issue = issue
+            ),
+            (Some(scope), None) => format!(
+                "{prefix}({scope}): {message})",
+                prefix = &self.prefix,
+                scope = scope,
+                message = &self.message,
+            ),
+            (None, None) => format!(
+                "{prefix}: {message})",
+                prefix = &self.prefix,
+                message = &self.message,
+            ),
         };
-        let git_repo = GitRepo::open()?;
+
         git_repo.commit(message)
     }
 }

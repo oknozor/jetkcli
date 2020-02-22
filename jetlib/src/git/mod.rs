@@ -17,6 +17,23 @@ impl GitRepo {
         self.repo.workdir()
     }
 
+    pub fn checkout(&self, branch_name: &str) -> Result<(), JetError> {
+        self.repo
+            .set_head(&format!("refs/heads/{}", branch_name))
+            .map_err(|err| err.into())
+    }
+
+    pub fn create_and_checkout(&self, branch_name: &str) -> Result<(), JetError> {
+        let mut revwalk = self.repo.revwalk()?;
+        revwalk.push_head()?;
+        let head = revwalk.last().expect("No HEAD in revwalk");
+        let head = head?;
+        let head = self.repo.find_commit(head)?;
+
+        let _ = &self.repo.branch(branch_name, &head, false)?;
+        self.checkout(branch_name)
+    }
+
     pub fn commit(&self, message: String) -> Result<(), JetError> {
         let repo = &self.repo;
         let sig = &self.repo.signature()?;
@@ -40,7 +57,7 @@ impl GitRepo {
 
         if !repo_is_empty && repo_has_deltas {
             let head = &self.repo.head()?;
-            let head_target = head.target().unwrap();
+            let head_target = head.target().expect("Cannot get HEAD target");
             let tip = &self.repo.find_commit(head_target)?;
 
             self.repo
@@ -66,7 +83,7 @@ impl GitRepo {
     pub fn get_current_branch_name(&self) -> Result<String, JetError> {
         let head = &self.repo.head()?;
         let head = head.shorthand();
-        let branch_name = head.unwrap().into();
+        let branch_name = head.expect("Cannot get HEAT").into();
         Ok(branch_name)
     }
 

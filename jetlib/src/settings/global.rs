@@ -63,7 +63,7 @@ impl GlobalSettings {
     }
 
     pub fn current_credentials(&self) -> Credentials {
-        let server_name = PROJECT_SETTINGS_SHARED.server_name.clone();
+        let server_name = PROJECT_SETTINGS_SHARED.jira.server_name.clone();
         self.servers.get(&server_name).unwrap().as_credentials()
     }
 }

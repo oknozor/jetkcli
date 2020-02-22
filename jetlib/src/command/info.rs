@@ -2,7 +2,8 @@ use crate::command::JetCommand;
 use crate::error::JetError;
 use crate::git::GitRepo;
 use crate::settings::global::GlobalSettings;
-use crate::settings::local::{ProjectSettings, ProjectSettingsShared};
+use crate::settings::private::ProjectSettings;
+use crate::settings::shared::ProjectSettingsShared;
 
 pub struct InfoCommand;
 
@@ -13,6 +14,12 @@ impl JetCommand for InfoCommand {
         let git = GitRepo::open()?;
         let branch_name = git.get_current_branch_name()?;
         println!("# On branch {}", branch_name);
+        let issue = super::branch_name_to_issue_key(&branch_name);
+        if let Some(issue) = issue {
+            println!("# Working on {}", issue);
+        } else {
+            println!("# Current branch as no corresponding jira issue")
+        }
 
         match ProjectSettingsShared::get() {
             Ok(ref settings) => {

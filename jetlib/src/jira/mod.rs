@@ -7,11 +7,14 @@ use search::*;
 
 pub mod model;
 
+use crate::jira::model::issue::Issue;
+use crate::jira::model::transition::Transition;
 use model::project::Project;
 use model::response::IssueSearch;
 use model::ToPage;
 
 const PROJECT: &str = "/rest/api/2/project";
+const ISSUE: &str = "/rest/api/2/issue";
 const SEARCH: &str = "/rest/api/2/search";
 
 pub struct Jira {
@@ -47,6 +50,7 @@ impl Jira {
             host,
         }
     }
+
     pub fn get_open_issues(&self) -> Result<String, reqwest::Error> {
         let jql = jql::Query {
             terms: vec![],
@@ -87,6 +91,22 @@ impl Jira {
     pub fn get_project(&self, project_name: &str) -> Result<Project, reqwest::Error> {
         self.client
             .get(&format!("{}{}/{}", self.host, PROJECT, project_name))
+            .basic_auth(&self.credentials.username, self.credentials.pass())
+            .send()?
+            .json()
+    }
+
+    pub fn get_issue_by_id(&self, issue_id: &str) -> Result<Issue, reqwest::Error> {
+        self.client
+            .get(&format!("{}{}/{}", self.host, ISSUE, issue_id))
+            .basic_auth(&self.credentials.username, self.credentials.pass())
+            .send()?
+            .json()
+    }
+
+    pub fn get_transitions(&self, issue_id: &str) -> Result<Vec<Transition>, reqwest::Error> {
+        self.client
+            .get(&format!("{}{}/{}/transitions", self.host, ISSUE, issue_id))
             .basic_auth(&self.credentials.username, self.credentials.pass())
             .send()?
             .json()
