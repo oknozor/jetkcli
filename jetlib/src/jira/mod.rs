@@ -8,10 +8,12 @@ use search::*;
 pub mod model;
 
 use crate::jira::model::issue::Issue;
-use crate::jira::model::transition::Transition;
+use crate::jira::model::response::Transitions;
+use crate::jira::model::transition::{Transition, TransitionRequest};
 use model::project::Project;
 use model::response::IssueSearch;
 use model::ToPage;
+use reqwest::Response;
 
 const PROJECT: &str = "/rest/api/2/project";
 const ISSUE: &str = "/rest/api/2/issue";
@@ -104,7 +106,35 @@ impl Jira {
             .json()
     }
 
-    pub fn get_transitions(&self, issue_id: &str) -> Result<Vec<Transition>, reqwest::Error> {
+    pub fn get_transitions(&self, issue_id: &str) -> Result<Transitions, reqwest::Error> {
+        self.client
+            .get(&format!("{}{}/{}/transitions", self.host, ISSUE, issue_id))
+            .basic_auth(&self.credentials.username, self.credentials.pass())
+            .send()?
+            .json()
+    }
+
+    pub fn do_transition(
+        &self,
+        issue_id: &str,
+        transition_id: &str,
+    ) -> Result<Response, reqwest::Error> {
+        let request = TransitionRequest::new(transition_id);
+        let body = serde_json::to_string(&request).unwrap();
+
+        self.client
+            .post(&format!("{}{}/{}/transitions", self.host, ISSUE, issue_id))
+            .header("Content-type", "application/json")
+            .basic_auth(&self.credentials.username, self.credentials.pass())
+            .body(body)
+            .send()
+    }
+
+    pub fn do_transition_by_name(
+        &self,
+        issue_id: &str,
+        transition_id: &str,
+    ) -> Result<(), reqwest::Error> {
         self.client
             .get(&format!("{}{}/{}/transitions", self.host, ISSUE, issue_id))
             .basic_auth(&self.credentials.username, self.credentials.pass())

@@ -33,9 +33,9 @@ pub struct Workflow {
 impl Default for Workflow {
     fn default() -> Self {
         Workflow {
-            todo: "TODO".to_string(),
-            wip: "WIP".to_string(),
-            done: "DONE".to_string(),
+            todo: "To Do".to_string(),
+            wip: "In Progress".to_string(),
+            done: "Done".to_string(),
         }
     }
 }

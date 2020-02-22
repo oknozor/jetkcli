@@ -1,6 +1,6 @@
 #[derive(Debug, Deserialize, Serialize)]
 pub struct InternalSettings {
-    workflow: Worflow
+    workflow: Workflow,
 }
 
 // On the first transition transition id is retrieved from the http API

@@ -1,9 +1,15 @@
 use super::issue::Issue;
 use super::ToPage;
+use crate::jira::model::transition::Transition;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct IssueSearch {
     pub issues: Vec<Issue>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct Transitions {
+    pub transitions: Vec<Transition>,
 }
 
 impl ToPage for IssueSearch {
