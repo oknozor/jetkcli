@@ -108,6 +108,10 @@ TODO
 
 ### TODOs
 
+- [ ] Error message format 
+- [ ] Colored message
+- [ ] Internal state
+    - [ ] Transitions id
 - config
     - [ ] templatize message ( default : "prefix(scope) message  \[issue\]")
 - [x] init command
@@ -158,5 +162,4 @@ TODO
 - [ ] changelogs command (see [git journal](https://github.com/saschagrunert/git-journal))
     - [ ] default from previous tag
     - [ ] opt --from 
-    - [ ] opt --to  
-- [ ]
+    - [ ] opt --to
