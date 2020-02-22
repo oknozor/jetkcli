@@ -1,8 +1,6 @@
 use std::collections::HashMap;
 
-use config::Config;
-use config::ConfigError;
-use config::File;
+use config::{Config, ConfigError, File};
 
 use crate::jira::Credentials;
 

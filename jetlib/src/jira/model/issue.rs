@@ -1,5 +1,4 @@
-use super::status::Status;
-use super::ToPage;
+use super::{status::Status, ToPage};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Issue {

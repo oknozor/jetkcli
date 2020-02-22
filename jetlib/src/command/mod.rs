@@ -1,6 +1,4 @@
-use crate::error::JetError;
-use crate::jira::Jira;
-use crate::settings::PROJECT_SETTINGS_SHARED;
+use crate::{error::JetError, jira::Jira, settings::PROJECT_SETTINGS_SHARED};
 
 pub mod checkout;
 pub mod commit;

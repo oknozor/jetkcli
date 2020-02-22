@@ -1,5 +1,4 @@
-use super::issue::Issue;
-use super::ToPage;
+use super::{issue::Issue, ToPage};
 use crate::jira::model::transition::Transition;
 
 #[derive(Serialize, Deserialize, Debug)]

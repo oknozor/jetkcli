@@ -1,14 +1,11 @@
-use crate::command::JetCommand;
-use crate::error::ConfigAlreadyExist;
-use crate::error::JetError;
-use crate::git::GitRepo;
-use crate::jira::Jira;
-use crate::settings::private::ProjectSettings;
-use crate::settings::shared::ProjectSettingsShared;
-use crate::settings::GLOBAL_SETTINGS;
-use std::fs::File;
-use std::io::Write;
-use std::path::Path;
+use crate::{
+    command::JetCommand,
+    error::{ConfigAlreadyExist, JetError},
+    git::GitRepo,
+    jira::Jira,
+    settings::{private::ProjectSettings, shared::ProjectSettingsShared, GLOBAL_SETTINGS},
+};
+use std::{fs::File, io::Write, path::Path};
 
 /// Init a .jetcli project inside a git repository
 pub struct InitCommand {

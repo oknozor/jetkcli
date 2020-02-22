@@ -1,6 +1,4 @@
-use crate::command::JetJiraCommand;
-use crate::error::JetError;
-use crate::jira::Jira;
+use crate::{command::JetJiraCommand, error::JetError, jira::Jira};
 
 pub struct PushCommand;
 

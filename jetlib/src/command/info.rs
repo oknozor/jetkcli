@@ -1,9 +1,9 @@
-use crate::command::JetCommand;
-use crate::error::JetError;
-use crate::git::GitRepo;
-use crate::settings::global::GlobalSettings;
-use crate::settings::private::ProjectSettings;
-use crate::settings::shared::ProjectSettingsShared;
+use crate::{
+    command::JetCommand,
+    error::JetError,
+    git::GitRepo,
+    settings::{global::GlobalSettings, private::ProjectSettings, shared::ProjectSettingsShared},
+};
 
 pub struct InfoCommand;
 

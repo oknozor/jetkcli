@@ -1,12 +1,8 @@
 use std::collections::HashMap;
 
-use moins::Color;
-use moins::Moins;
-use moins::PagerOptions;
+use moins::{Color, Moins, PagerOptions};
 
-use crate::command::JetJiraCommand;
-use crate::error::JetError;
-use crate::jira::Jira;
+use crate::{command::JetJiraCommand, error::JetError, jira::Jira};
 
 pub struct ListIssuesCommand;
 

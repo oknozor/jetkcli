@@ -1,6 +1,4 @@
-use crate::command::JetCommand;
-use crate::error::JetError;
-use crate::git::GitRepo;
+use crate::{command::JetCommand, error::JetError, git::GitRepo};
 
 pub struct CommitCommand {
     pub prefix: String,

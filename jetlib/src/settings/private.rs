@@ -1,7 +1,5 @@
 use crate::git::GitRepo;
-use config::Config;
-use config::ConfigError;
-use config::File;
+use config::{Config, ConfigError, File};
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct ProjectSettings {

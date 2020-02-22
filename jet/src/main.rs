@@ -2,16 +2,19 @@ extern crate clap;
 
 use clap::{App, Arg, SubCommand};
 
-use jetlib::command::checkout::CheckoutCommand;
-use jetlib::command::commit::CommitCommand;
-use jetlib::command::info::InfoCommand;
-use jetlib::command::init::InitCommand;
-use jetlib::command::issues::ListIssuesCommand;
-use jetlib::command::{JetCommand, JetJiraCommand};
-use jetlib::jira::Jira;
-use jetlib::settings::shared::ProjectSettingsShared;
-use jetlib::settings::GLOBAL_SETTINGS;
-use jetlib::settings::PROJECT_SETTINGS_SHARED;
+use jetlib::{
+    command::{
+        checkout::CheckoutCommand,
+        commit::CommitCommand,
+        info::InfoCommand,
+        init::InitCommand,
+        issues::ListIssuesCommand,
+        JetCommand,
+        JetJiraCommand,
+    },
+    jira::Jira,
+    settings::{shared::ProjectSettingsShared, GLOBAL_SETTINGS, PROJECT_SETTINGS_SHARED},
+};
 use std::borrow::BorrowMut;
 
 fn main() {

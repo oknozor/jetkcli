@@ -1,8 +1,10 @@
-use crate::command::JetJiraCommand;
-use crate::error::JetError;
-use crate::git::GitRepo;
-use crate::jira::Jira;
-use crate::settings::PROJECT_SETTINGS_SHARED;
+use crate::{
+    command::JetJiraCommand,
+    error::JetError,
+    git::GitRepo,
+    jira::Jira,
+    settings::PROJECT_SETTINGS_SHARED,
+};
 
 pub struct CheckoutCommand {
     pub target_issue: String,
@@ -29,7 +31,7 @@ impl JetJiraCommand for CheckoutCommand {
                 .expect("unable to find in progress transition");
 
             // TODO : fail if status is not 204
-            let status = jira.do_transition(&issue.key, &in_progress.id)?.status();
+            let _ = jira.do_transition(&issue.key, &in_progress.id)?.status();
 
             // assign issue
             git.create_and_checkout(&branch_name)?;

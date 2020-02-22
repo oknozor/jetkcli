@@ -2,17 +2,16 @@ mod jql;
 mod search;
 
 use jql::*;
-use search::Search;
-use search::*;
+use search::{Search, *};
 
 pub mod model;
 
-use crate::jira::model::issue::Issue;
-use crate::jira::model::response::Transitions;
-use crate::jira::model::transition::{Transition, TransitionRequest};
-use model::project::Project;
-use model::response::IssueSearch;
-use model::ToPage;
+use crate::jira::model::{
+    issue::Issue,
+    response::Transitions,
+    transition::{Transition, TransitionRequest},
+};
+use model::{project::Project, response::IssueSearch, ToPage};
 use reqwest::Response;
 
 const PROJECT: &str = "/rest/api/2/project";

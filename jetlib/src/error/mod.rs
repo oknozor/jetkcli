@@ -1,7 +1,5 @@
 use config::ConfigError;
-use std::error::Error;
-use std::fmt;
-use std::{env, io};
+use std::{env, error::Error, fmt, io};
 
 #[derive(Debug)]
 pub enum JetError {
