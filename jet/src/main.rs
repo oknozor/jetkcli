@@ -2,6 +2,7 @@ extern crate clap;
 
 use clap::{App, Arg, SubCommand};
 
+use jetlib::command::checkout::CheckoutCommand;
 use jetlib::command::commit::CommitCommand;
 use jetlib::command::info::InfoCommand;
 use jetlib::command::init::InitCommand;
@@ -32,11 +33,33 @@ fn main() {
         None
     };
 
+    let checkouts = if let Ok(settings) = ProjectSettingsShared::get() {
+        Some(
+            settings
+                .branch_types
+                .iter()
+                .map(|prefix| SubCommand::with_name(&prefix).arg(Arg::with_name("ISSUE")))
+                .collect::<Vec<App>>(),
+        )
+    } else {
+        None
+    };
+
     let matches = App::new("Jet")
         .version("0.1")
         .author("Paul D. <paul.delafosse@protonmail.com>")
         .about("Jira kung fu client")
         .subcommands(commit_types.unwrap_or_else(|| vec![SubCommand::with_name("commit")]))
+        .subcommand(
+            SubCommand::with_name("checkout")
+                .arg(
+                    Arg::with_name("branch")
+                        .long("branch")
+                        .short("b")
+                        .help("template issue branch"),
+                )
+                .subcommands(checkouts.unwrap_or_else(|| vec![SubCommand::with_name("checkout")])),
+        )
         .subcommand(
             SubCommand::with_name("init")
                 .arg(
@@ -71,19 +94,57 @@ fn main() {
 
                 InitCommand::new(project_name, server_name)
                     .execute()
-                    .unwrap();
+                    .expect("Error during project initialisation");
             }
-            "info" => InfoCommand.execute().unwrap(),
+            "info" => InfoCommand
+                .execute()
+                .expect("Error during fetching project info"),
             "issues" => {
                 // We need the http client
                 let host = &PROJECT_SETTINGS_SHARED.server_url;
                 let credentials = GLOBAL_SETTINGS.current_credentials();
                 let mut jira = Jira::new(credentials, host);
 
-                ListIssuesCommand.execute(jira.borrow_mut()).unwrap();
+                ListIssuesCommand
+                    .execute(jira.borrow_mut())
+                    .expect("Error while fetching jira issues");
+            }
+            "checkout" => {
+                let checkout = matches
+                    .subcommand_matches("checkout")
+                    .expect("Unable to get checkout subcommands");
+                let settings = ProjectSettingsShared::get().expect("Unable to get shared settings");
+                let new_branch = checkout.is_present("branch");
+                settings.branch_types.iter().for_each(|prefix| {
+                    if let Some(args) = checkout.subcommand_matches(&prefix) {
+                        let prefix = prefix.to_owned();
+
+                        // FIXME
+                        let target_issue = args.value_of("ISSUE");
+                        println!("{:?}", target_issue);
+
+                        let target_issue = target_issue
+                            .expect("Expected an issue key as argument")
+                            .into();
+
+                        let command = CheckoutCommand {
+                            target_issue,
+                            prefix,
+                            new_branch,
+                        };
+
+                        let host = &PROJECT_SETTINGS_SHARED.server_url;
+                        let credentials = GLOBAL_SETTINGS.current_credentials();
+                        let mut jira = Jira::new(credentials, host);
+
+                        command
+                            .execute(&mut jira)
+                            .expect("Error during checkout command");
+                    };
+                });
             }
             _other => {
-                let settings = ProjectSettingsShared::get().unwrap();
+                let settings = ProjectSettingsShared::get().expect("Unable to get shared settings");
                 settings.commit_types.iter().for_each(|prefix| {
                     if let Some(args) = matches.subcommand_matches(&prefix) {
                         let message = args.value_of("message").unwrap().to_string();
