@@ -121,7 +121,8 @@ TODO
     - [x] current jira issue
     - [x] optional scope
     - [x] default behavior for unmapped branch
-    - [ ] fix empty repository scenario 
+    - [ ] fix empty repository scenario
+    - [ ] optionally commit with $EDITOR
 - [ ] install commit hooks
     - [ ] validate commit message against template
 - [ ] info command
