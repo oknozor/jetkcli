@@ -16,19 +16,86 @@ If your project doesn't match this description you probably don't want to use Je
 
 ## What Jet can do for me ? 
 
-1. When working on a project developers often try to enforce several good practices regarding commit messages, 
-branching model Jira flow etc. Unfortunately people, come and go, and we humans do mistakes.
+1. When working on a project developers often try to enforce good practices regarding commit messages, 
+branching model Jira workflow etc. Unfortunately people, come and go, humans do mistakes and things get messy.
 
-2. When working with Jira we do a lot of repeating tasks that matches an action we have already done in git. For
-instance, I am working on a project where I have to assign a jira issue to the same reviewer every time I submit a PR
-for this issue. 
+2. When working with Jira we do a lot of repeating tasks that conceptually matches actions made with git. 
+Let us assume the following scenario :
 
-Jet provide a higher level abstraction which allow you to perform tasks on both git objects and jira issues. 
-It enforce a branching model and a commit message convention referencing your issues.
-It would be pointless to respect such conventions if it was not to generate pretty change logs. So Jet allows you to 
-generate change logs too.
+- Alice the lead dev asks Bob to implement a new command in the jet project. She tells Bob to take the corresponding issue. 
+- Bob start working on "JET-1" and assign it to himself transitioning the issue state to "Work in progress".
+- He checks out a new local git branch with the name `feat/JET-1` 
+- When he is done editing the code Bob creates a commit with the following message `feat(command): add jet 1 feature [JET-1]"
+- When Bob is done working on an issue he pushes is work to the remote repository and submit a PR
+- He assign Alice to review it.
+- He change the issue state on jira to "Review" and assign it to Alice.
+
+Jet's goal is to reduce repetition and automate some tasks by unifying related jira and git workflow when possible. 
+
+Here are the planned feature to achieve this goal : 
+- It enforce a branching model and a commit message convention referencing your issues 
+(see [conventional commit](https://www.conventionalcommits.org/en/v1.0.0/))
+- Handy commit generation command matching your convention model (all you need to type is the commit message).
+- Automatic branch naming.
+- Transition issue state and assignment automatically when you start working on one. 
+- Submit PRs on the git platform where your project is hosted. 
+- Automatically submit your PRs on your git platform (bitbucket, github, gitlab) and assign reviewers to it. 
+- Transition issue state and assignment automatically when you submit a PR. 
+- Read issue description and comments from the command line. 
+- Generate markdown changelogs
+
+## Example workflow
+
+1. Init
+
+```sh
+jet init -p PRO
+```
+
+TODO
+ 
+2. Checkout 
+
+TODO 
+
+```shell script
+jet checkout -b feat JET-1
+``` 
+
+```shell script
+jet checkout feat JET-1
+``` 
+
+3. Commit
+
+f
+Jet generate sub-commands matching your configured commit prefix (see [project settings shared](#shared-project-settings):
+
+```shell script
+jet feat "this is a cool feature"
+```
+Assuming you are working on the issue `JET-1` this will produce the following commit `feat: this is a cool feature [JET-1]`
+
+Additionally you can provide a scope for your commit :
+
+```shell script
+jet fix "toml parse error" config
+```
+
+This will produce the following commit `fix(config): toml parse error [JET-1]`
+
+4. Submit 
+
+```shell script
+jet sumbit
+```
+
+TODO
 
 
+
+## Installation
+TODO
 ## Configuration
 TODO
 ### Global settings
@@ -38,8 +105,11 @@ TODO
 ### Shared project settings
 TODO
 
+
 ### TODOs
 
+- config
+    - [ ] templatize message ( default : "prefix(scope) message  \[issue\]")
 - [x] init command
 - [x] template commit command
     - [x] generate commit prefix from config
@@ -47,14 +117,15 @@ TODO
     - [x] current jira issue
     - [x] optional scope
     - [x] default behavior for unmapped branch
+    - [ ] fix empty repository scenario 
 - [ ] install commit hooks
     - [ ] validate commit message against template
 - [ ] info command
-    - [x] current branch name
     - [ ] dump config (ie. without credentials)
     - [ ] opt global
     - [ ] opt local
 - [ ] status command
+    - [x] current branch name
     - [ ] show current issue
     - [ ] issue state
     - [ ] issue description --details
@@ -84,10 +155,8 @@ TODO
 - [ ] open command 
     - [ ] open jira issue in the browser
     - [ ] opt `--git` to open pull request page
-- [ ] changelogs command
+- [ ] changelogs command (see [git journal](https://github.com/saschagrunert/git-journal))
     - [ ] default from previous tag
     - [ ] opt --from 
     - [ ] opt --to  
-
-### Command doc
-TODO
+- [ ]
