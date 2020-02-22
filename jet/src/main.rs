@@ -9,7 +9,7 @@ use jetlib::command::init::InitCommand;
 use jetlib::command::issues::ListIssuesCommand;
 use jetlib::command::{JetCommand, JetJiraCommand};
 use jetlib::jira::Jira;
-use jetlib::settings::local::ProjectSettingsShared;
+use jetlib::settings::shared::ProjectSettingsShared;
 use jetlib::settings::GLOBAL_SETTINGS;
 use jetlib::settings::PROJECT_SETTINGS_SHARED;
 use std::borrow::BorrowMut;
@@ -19,6 +19,7 @@ fn main() {
     let commit_types = if let Ok(settings) = ProjectSettingsShared::get() {
         Some(
             settings
+                .git
                 .commit_types
                 .iter()
                 .map(|prefix| {
@@ -36,6 +37,7 @@ fn main() {
     let checkouts = if let Ok(settings) = ProjectSettingsShared::get() {
         Some(
             settings
+                .git
                 .branch_types
                 .iter()
                 .map(|prefix| SubCommand::with_name(&prefix).arg(Arg::with_name("ISSUE")))
@@ -76,7 +78,7 @@ fn main() {
                         .short("s")
                         .takes_value(true)
                         .help("remote server name in the global .jetcli config file")
-                        .required(true),
+                        .required(false),
                 )
                 .about("init")
                 .help("Init a .jetcli project inside a git repository"),
@@ -101,7 +103,7 @@ fn main() {
                 .expect("Error during fetching project info"),
             "issues" => {
                 // We need the http client
-                let host = &PROJECT_SETTINGS_SHARED.server_url;
+                let host = &PROJECT_SETTINGS_SHARED.jira.server_url;
                 let credentials = GLOBAL_SETTINGS.current_credentials();
                 let mut jira = Jira::new(credentials, host);
 
@@ -115,7 +117,7 @@ fn main() {
                     .expect("Unable to get checkout subcommands");
                 let settings = ProjectSettingsShared::get().expect("Unable to get shared settings");
                 let new_branch = checkout.is_present("branch");
-                settings.branch_types.iter().for_each(|prefix| {
+                settings.git.branch_types.iter().for_each(|prefix| {
                     if let Some(args) = checkout.subcommand_matches(&prefix) {
                         let prefix = prefix.to_owned();
 
@@ -133,7 +135,7 @@ fn main() {
                             new_branch,
                         };
 
-                        let host = &PROJECT_SETTINGS_SHARED.server_url;
+                        let host = &PROJECT_SETTINGS_SHARED.jira.server_url;
                         let credentials = GLOBAL_SETTINGS.current_credentials();
                         let mut jira = Jira::new(credentials, host);
 
@@ -145,7 +147,7 @@ fn main() {
             }
             _other => {
                 let settings = ProjectSettingsShared::get().expect("Unable to get shared settings");
-                settings.commit_types.iter().for_each(|prefix| {
+                settings.git.commit_types.iter().for_each(|prefix| {
                     if let Some(args) = matches.subcommand_matches(&prefix) {
                         let message = args.value_of("message").unwrap().to_string();
                         let scope = args.value_of("scope").map(|scope| scope.to_string());
