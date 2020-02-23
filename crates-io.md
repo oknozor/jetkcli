@@ -1,11 +1,5 @@
 # Jetkcli [![Latest Version]][crates.io] [![Build Status]][travis]
 
-
-[Build Status]: https://travis-ci.com/oknozor/musicbrainz_rs.svg?branch=master
-[travis]: https://travis-ci.com/oknozor/musicbrainz_rs
-[Latest Version]: https://img.shields.io/crates/v/jetkcli.svg
-[crates.io]: https://www.crates.io/crates/jetkcli
-
 Jira Embedded Terminal Kung fu Command-line interface
 ---
 ⚠️ **Jetkcli is still a work in progress** ⚠️

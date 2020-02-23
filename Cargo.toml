@@ -1,8 +1,18 @@
 [package]
 name = "jetkcli"
-version = "0.1.0"
+version = "0.1.0-alpha1"
 authors = ["Paul Delafosse <paul.delafosse@protonmail.com>"]
 edition = "2018"
+license = "MIT"
+readme = "crates-io.md"
+repository = "https://github.com/oknozor/jetkcli"
+documentation = "https://docs.rs/jetkcli"
+description = """
+A strongly opininated jira/git command line interface
+"""
+
+[badges]
+travis-ci = { repository = "oknozor/jetkcli", branch = "master" }
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
