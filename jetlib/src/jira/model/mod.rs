@@ -1,3 +1,4 @@
+pub mod assignee;
 pub mod issue;
 pub mod project;
 pub mod response;

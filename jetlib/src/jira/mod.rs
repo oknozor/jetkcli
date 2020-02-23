@@ -6,7 +6,12 @@ use search::{Search, *};
 
 pub mod model;
 
-use crate::jira::model::{issue::Issue, response::Transitions, transition::TransitionRequest};
+use crate::jira::model::{
+    assignee::AssigneeRequest,
+    issue::Issue,
+    response::Transitions,
+    transition::TransitionRequest,
+};
 use model::{project::Project, response::IssueSearch, ToPage};
 use reqwest::Response;
 
@@ -26,7 +31,7 @@ pub struct Credentials {
 }
 
 impl Credentials {
-    fn username_simple(&self) -> String {
+    pub fn username_simple(&self) -> String {
         let split: Vec<&str> = self.username.split('@').collect();
         let split = *split.get(0).unwrap();
         split.to_string()
@@ -131,6 +136,22 @@ impl Jira {
 
         self.client
             .post(&format!("{}{}/{}/transitions", self.host, ISSUE, issue_id))
+            .header("Content-type", "application/json")
+            .basic_auth(&self.credentials.username, self.credentials.pass())
+            .body(body)
+            .send()
+    }
+
+    pub fn assign(
+        &self,
+        issue_id: &str,
+        username: &str,
+    ) -> Result<Response, reqwest::Error> {
+        let request = AssigneeRequest::new(username);
+        let body = serde_json::to_string(&request).unwrap();
+
+        self.client
+            .put(&format!("{}{}/{}/assignee", self.host, ISSUE, issue_id))
             .header("Content-type", "application/json")
             .basic_auth(&self.credentials.username, self.credentials.pass())
             .body(body)

@@ -3,7 +3,7 @@ use crate::{
     error::JetError,
     git::GitRepo,
     jira::Jira,
-    settings::{internal::InternalSettings, PROJECT_SETTINGS_SHARED},
+    settings::{internal::InternalSettings, GLOBAL_SETTINGS, PROJECT_SETTINGS_SHARED},
 };
 use reqwest::StatusCode;
 use std::{fs::OpenOptions, io::Write, process};
@@ -60,10 +60,23 @@ impl JetJiraCommand for CheckoutCommand {
                 };
 
             match jira.do_transition(&issue.key, &transition_id)?.status() {
-                StatusCode::OK => (),
+                StatusCode::NO_CONTENT => (),
                 err_status => {
                     eprintln!(
                         "Could not transition Jira issue status code {}",
+                        err_status.as_u16()
+                    );
+                    process::exit(1);
+                }
+            };
+
+            let username = GLOBAL_SETTINGS.current_credentials().username_simple();
+            match jira.assign(&issue.key, &username)?.status() {
+                StatusCode::NO_CONTENT => (),
+                err_status => {
+                    eprintln!(
+                        "Could not assign Jira issue to {} status code {}",
+                        username,
                         err_status.as_u16()
                     );
                     process::exit(1);

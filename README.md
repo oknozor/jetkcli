@@ -141,9 +141,9 @@ TODO
     - [ ] opt open
     - [ ] opt search
     - [ ] opt user
-- [ ] checkout command
+- [x] checkout command
     - [x] fetch issue
-    - [ ] if not assign issue to the current user 
+    - [x] if not assign issue to the current user 
     - [x] create and checkout branch from template
     - [x] checkout branch from template
     - [x] create and checkout branch from template
