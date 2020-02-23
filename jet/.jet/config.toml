@@ -1,4 +1,0 @@
-# jira user name of your default reviewers
-reviewers = ["john doe", "michel dupont", "alice white"]
-# user to assign your completed issues
-default_assignee =  "kevin the techlead"

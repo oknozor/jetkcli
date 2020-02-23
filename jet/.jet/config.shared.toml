@@ -1,6 +1,0 @@
-# define your branches prefixes
-name = "test"
-branch_types = ["fix", "feat", "chore", "style", "doc"]
-commit_types = ["fix", "feat", "chore", "style", "doc"]
-# branch prefix separator : `feat/some-feature`
-branch_separator = "/"
