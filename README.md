@@ -149,6 +149,7 @@ TODO
     - [x] create and checkout branch from template
     - [x] change issue state to ${WIP}
         - [x] save transition id to internal settings
+    - [ ] checkout without prefix for issue with exactly one matching branch
 - [ ] submit command
     - [ ] create a new PR on the remote git platform
     - [ ] assign reviewers
