@@ -1,4 +1,4 @@
-# Jetkcli [![Latest Version]][crates.io] [![Build Status]][travis]
+# Jetkcli
 
 
 [Build Status]: https://travis-ci.com/oknozor/musicbrainz_rs.svg?branch=master
