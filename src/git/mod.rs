@@ -1,5 +1,5 @@
 use crate::error::JetError;
-use git2::{DiffOptions, Object, ObjectType, Repository};
+use git2::{BranchType, DiffOptions, Object, ObjectType, Repository};
 use std::path::Path;
 
 pub(crate) struct GitRepo {
@@ -24,6 +24,29 @@ impl GitRepo {
         self.repo
             .set_head(&format!("refs/heads/{}", branch_name))
             .map_err(|err| err.into())
+    }
+
+    pub fn find_checkout(
+        &self,
+        issue_key: &str,
+    ) -> Result<(), JetError> {
+        let branches = self.repo.branches(Some(BranchType::Local))?;
+        let matches: Vec<String> = branches
+            .map(|branch| {
+                let branch = branch.unwrap().0;
+                let name = branch.name().unwrap().unwrap().to_owned();
+                name
+            })
+            .filter(|branch_name| branch_name.contains(issue_key))
+            .collect();
+
+        if matches.is_empty() {
+            Err(JetError::BranchNotFound(issue_key.into()))
+        } else if matches.len() == 1 {
+            self.checkout(&matches[0])
+        } else {
+            Err(JetError::MoreThanOneIssueBranch(matches))
+        }
     }
 
     pub fn create_and_checkout(

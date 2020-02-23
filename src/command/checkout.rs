@@ -1,5 +1,5 @@
 use crate::{
-    command::JetJiraCommand,
+    command::{JetCommand, JetJiraCommand},
     error::JetError,
     git::GitRepo,
     jira::Jira,
@@ -12,6 +12,10 @@ pub struct CheckoutCommand {
     pub target_issue: String,
     pub prefix: String,
     pub new_branch: bool,
+}
+
+pub struct SimpleCheckoutCommand {
+    pub target_issue: String,
 }
 
 impl JetJiraCommand for CheckoutCommand {
@@ -98,5 +102,21 @@ impl JetJiraCommand for CheckoutCommand {
         }
 
         Ok(())
+    }
+}
+
+impl SimpleCheckoutCommand {
+    pub fn new(target_issue: &str) -> SimpleCheckoutCommand {
+        SimpleCheckoutCommand {
+            target_issue: target_issue.into(),
+        }
+    }
+}
+
+impl JetCommand for SimpleCheckoutCommand {
+    fn execute(&self) -> Result<(), JetError> {
+        let git = GitRepo::open()?;
+        git.find_checkout(&self.target_issue)
+            .map_err(JetError::from)
     }
 }

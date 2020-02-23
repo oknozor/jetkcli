@@ -7,6 +7,8 @@ pub enum JetError {
     ConfigError(ConfigError),
     ConfigAlreadyExist(ConfigAlreadyExist),
     NotAGitRepository(git2::Error),
+    MoreThanOneIssueBranch(Vec<String>),
+    BranchNotFound(String),
     EmptyIndex,
     JiraResourceNotFound(reqwest::Error),
     TomlError(toml::ser::Error),
@@ -38,6 +40,10 @@ impl fmt::Display for JetError {
             }
             JetError::Other => write!(f, "Unknown Jet error"),
             JetError::ConfigError(ref cause) => write!(f, "Config error {}", cause),
+            JetError::MoreThanOneIssueBranch(ref branches) => {
+                write!(f, "Found multiple matching branch {:?}", branches)
+            }
+            JetError::BranchNotFound(ref branch) => write!(f, "No such branch {}", branch),
         }
     }
 }
@@ -55,6 +61,8 @@ impl Error for JetError {
             JetError::TomlError(ref cause) => cause.description(),
             JetError::Other => "Unknown .jetcli error!",
             JetError::ConfigError(ref cause) => cause.description(),
+            JetError::MoreThanOneIssueBranch(_) => "More than one matching branch",
+            JetError::BranchNotFound(_) => "No such branch",
         }
     }
 
@@ -68,6 +76,8 @@ impl Error for JetError {
             JetError::Other => None,
             JetError::ConfigError(ref cause) => Some(cause),
             JetError::EmptyIndex => None,
+            JetError::MoreThanOneIssueBranch(_) => None,
+            JetError::BranchNotFound(_) => None,
         }
     }
 }

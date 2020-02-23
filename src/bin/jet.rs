@@ -4,7 +4,7 @@ use clap::{App, Arg, SubCommand};
 
 use jetlib::{
     command::{
-        checkout::CheckoutCommand,
+        checkout::{CheckoutCommand, SimpleCheckoutCommand},
         commit::CommitCommand,
         info::InfoCommand,
         init::InitCommand,
@@ -19,7 +19,7 @@ use std::borrow::BorrowMut;
 
 fn main() {
     // Generate pre-formatted commit commands
-    let commit_types = if let Ok(settings) = ProjectSettingsShared::get() {
+    let commit_subcommands = if let Ok(settings) = ProjectSettingsShared::get() {
         Some(
             settings
                 .git
@@ -37,7 +37,7 @@ fn main() {
         None
     };
 
-    let checkouts = if let Ok(settings) = ProjectSettingsShared::get() {
+    let checkouts_subcommands = if let Ok(settings) = ProjectSettingsShared::get() {
         Some(
             settings
                 .git
@@ -54,16 +54,17 @@ fn main() {
         .version("0.1")
         .author("Paul D. <paul.delafosse@protonmail.com>")
         .about("Jira kung fu client")
-        .subcommands(commit_types.unwrap_or_else(|| vec![SubCommand::with_name("commit")]))
+        .subcommands(commit_subcommands.unwrap_or_else(|| vec![]))
         .subcommand(
             SubCommand::with_name("checkout")
+                .arg(Arg::with_name("ISSUE").required(false))
                 .arg(
                     Arg::with_name("branch")
                         .long("branch")
                         .short("b")
                         .help("template issue branch"),
                 )
-                .subcommands(checkouts.unwrap_or_else(|| vec![SubCommand::with_name("checkout")])),
+                .subcommands(checkouts_subcommands.unwrap_or_else(|| vec![])),
         )
         .subcommand(
             SubCommand::with_name("init")
@@ -118,34 +119,40 @@ fn main() {
                 let checkout = matches
                     .subcommand_matches("checkout")
                     .expect("Unable to get checkout subcommands");
+
                 let settings = ProjectSettingsShared::get().expect("Unable to get shared settings");
+
+                let host = &settings.jira.server_url;
+                let credentials = GLOBAL_SETTINGS.current_credentials();
+                let mut jira = Jira::new(credentials, host);
+
                 let new_branch = checkout.is_present("branch");
-                settings.git.branch_types.iter().for_each(|prefix| {
-                    if let Some(args) = checkout.subcommand_matches(&prefix) {
-                        let prefix = prefix.to_owned();
+                if let Some(issue) = checkout.value_of("ISSUE") {
+                    SimpleCheckoutCommand::new(issue).execute().unwrap();
+                } else {
+                    settings.git.branch_types.iter().for_each(|prefix| {
+                        if let Some(args) = checkout.subcommand_matches(&prefix) {
+                            let prefix = prefix.to_owned();
 
-                        let target_issue = args.value_of("ISSUE");
-                        println!("{:?}", target_issue);
+                            let target_issue = args.value_of("ISSUE");
+                            println!("{:?}", target_issue);
 
-                        let target_issue = target_issue
-                            .expect("Expected an issue key as argument")
-                            .into();
+                            let target_issue = target_issue
+                                .expect("Expected an issue key as argument")
+                                .into();
 
-                        let command = CheckoutCommand {
-                            target_issue,
-                            prefix,
-                            new_branch,
+                            let command = CheckoutCommand {
+                                target_issue,
+                                prefix,
+                                new_branch,
+                            };
+
+                            command
+                                .execute(&mut jira)
+                                .expect("Error during checkout command");
                         };
-
-                        let host = &PROJECT_SETTINGS_SHARED.jira.server_url;
-                        let credentials = GLOBAL_SETTINGS.current_credentials();
-                        let mut jira = Jira::new(credentials, host);
-
-                        command
-                            .execute(&mut jira)
-                            .expect("Error during checkout command");
-                    };
-                });
+                    });
+                }
             }
             _other => {
                 let settings = ProjectSettingsShared::get().expect("Unable to get shared settings");
