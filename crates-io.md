@@ -1,4 +1,4 @@
-# Jetkcli [![Latest Version]][crates.io] [![Build Status]][travis]
+# Jetkcli
 
 Jira Embedded Terminal Kung fu Command-line interface
 ---
