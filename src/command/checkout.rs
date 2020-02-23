@@ -1,8 +1,8 @@
 use crate::{
-    command::{JetCommand, JetJiraCommand},
+    command::JetJiraCommand,
     error::JetError,
     git::GitRepo,
-    jira::Jira,
+    jira::{model::issue::Issue, Jira},
     settings::{internal::InternalSettings, GLOBAL_SETTINGS, PROJECT_SETTINGS_SHARED},
 };
 use std::{fs::OpenOptions, io::Write};
@@ -78,6 +78,7 @@ impl JetJiraCommand for CheckoutCommand {
                 "Checkout branch, currently working on jira issue {}",
                 issue.key
             );
+            CheckoutCommand::warn_if_not_assigned(issue)
         }
 
         Ok(())
@@ -92,10 +93,31 @@ impl SimpleCheckoutCommand {
     }
 }
 
-impl JetCommand for SimpleCheckoutCommand {
-    fn execute(&self) -> Result<(), JetError> {
+impl JetJiraCommand for SimpleCheckoutCommand {
+    fn execute(
+        &self,
+        jira: &mut Jira,
+    ) -> Result<(), JetError> {
         let git = GitRepo::open()?;
+
+        let issue = jira.get_issue_by_id(&self.target_issue)?;
+        CheckoutCommand::warn_if_not_assigned(issue);
+
         git.find_checkout(&self.target_issue)
             .map_err(JetError::from)
+    }
+}
+
+impl CheckoutCommand {
+    fn warn_if_not_assigned(issue: Issue) {
+        let assignee = issue.fields.assignee.map(|assigne| assigne.name);
+        let username = GLOBAL_SETTINGS.current_credentials().username_simple();
+        if let Some(assignee) = assignee {
+            if assignee != username {
+                println!("Warning {} is currently assigned to this issue", assignee)
+            }
+        } else {
+            println!("Warning this issue is currently unassigned")
+        }
     }
 }

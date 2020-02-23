@@ -128,7 +128,9 @@ fn main() {
 
                 let new_branch = checkout.is_present("branch");
                 if let Some(issue) = checkout.value_of("ISSUE") {
-                    SimpleCheckoutCommand::new(issue).execute().unwrap();
+                    SimpleCheckoutCommand::new(issue)
+                        .execute(&mut jira)
+                        .unwrap();
                 } else {
                     settings.git.branch_types.iter().for_each(|prefix| {
                         if let Some(args) = checkout.subcommand_matches(&prefix) {

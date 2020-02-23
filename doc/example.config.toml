@@ -1,0 +1,11 @@
+[servers.my_corporate_jira]
+
+url = "corporate.jira.com"
+username = "bob.smith@yopmail.com"
+password = "hunter2"
+
+[servers.local]
+
+url = "http://localhost:8080"
+username = "bob.smith"
+password = "hunter2"

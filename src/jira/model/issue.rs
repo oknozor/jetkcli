@@ -1,4 +1,5 @@
 use super::{status::Status, ToPage};
+use crate::jira::model::assignee::Assignee;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Issue {
@@ -11,6 +12,7 @@ pub struct Issue {
 pub struct Fields {
     pub status: Option<Status>,
     pub summary: Option<String>,
+    pub assignee: Option<Assignee>,
 }
 
 impl ToPage for Issue {
