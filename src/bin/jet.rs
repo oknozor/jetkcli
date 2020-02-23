@@ -2,7 +2,7 @@ extern crate clap;
 
 use clap::{App, Arg, SubCommand};
 
-use jetlib::{
+use jetkcli::{
     command::{
         checkout::{CheckoutCommand, SimpleCheckoutCommand},
         commit::CommitCommand,
@@ -81,11 +81,11 @@ fn main() {
                         .long("server")
                         .short("s")
                         .takes_value(true)
-                        .help("remote server name in the global .jetcli config file")
+                        .help("remote server name in the global jet config file")
                         .required(false),
                 )
                 .about("init")
-                .help("Init a .jetcli project inside a git repository"),
+                .help("Init a jet project inside a git repository"),
         )
         .subcommand(SubCommand::with_name("issues").about("display all ongoing issues"))
         .subcommand(SubCommand::with_name("info").about("dump info on the current jet project"))

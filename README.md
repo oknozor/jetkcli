@@ -1,7 +1,6 @@
-# Jetcli : Jira Embedded Terminal Client
-Jet is a strongly opinionated cli to automate jira and git task.
+# Jetkcli : Jira Embedded Terminal Kung fu Command-line interface
 ---
-⚠️ **Jetcli is still a work in progress** ⚠️
+⚠️ **Jetkcli is still a work in progress** ⚠️
 
 **Please don't rush into installing and using jet before you understand why and how to use it. Take time to read this 
 section, this might save you some precious time.** 
@@ -22,11 +21,12 @@ branching model Jira workflow etc. Unfortunately people, come and go, humans do 
 2. When working with Jira we do a lot of repeating tasks that conceptually matches actions made with git. 
 Let us assume the following scenario :
 
-Alice the lead dev asks Bob to implement a new command in the jet project. She tells Bob to take the corresponding issue. 
-Bob start working on "JET-1" and assign it to himself transitioning the issue state to "Work in progress".
-He checks out a new local git branch with the name `feat/JET-1` 
-When he is done editing the code Bob creates a commit with the following message `feat(command): add jet 1 feature [JET-1]"
-When Bob is done working on an issue he pushes is work to the remote repository and submit a PR
+Alice the lead dev asks Bob to implement a new command in the jet project. 
+She tells Bob to take the corresponding issue. 
+Bob start working on **JET-1** and assign it to himself transitioning the issue state to **"Work in progress"**.
+He checks out a new local git branch with the name `feat/JET-1`.
+When he is done editing the code Bob creates a commit with the following message : `feat(command): add jet 1 feature [JET-1]`.
+Bob is done coding so he pushes is work to the remote repository and submit a PR.
 He assign Alice to review it.
 He change the issue state on jira to "Review" and assign it to Alice.
 
@@ -48,9 +48,9 @@ Here are the planned feature to achieve this goal :
 
 ## Installation
 
-To install jetcli you will need [rust installed on your system](https://www.rust-lang.org/tools/install).
+To install Jetkcli you will need [rust installed on your system](https://www.rust-lang.org/tools/install).
 
-you can then run `cargo install jetcli`
+you can then run `cargo install jetkcli`
 
 ### Global settings
 

@@ -12,7 +12,7 @@ use crate::{
 };
 use std::{fs::File, io::Write, path::Path};
 
-/// Init a .jetcli project inside a git repository
+/// Init a .jet project inside a git repository
 pub struct InitCommand {
     project_name: String,
     server_name: Option<String>,
