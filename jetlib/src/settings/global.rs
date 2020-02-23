@@ -52,11 +52,17 @@ impl GlobalSettings {
         &self.servers.keys().last().unwrap()
     }
 
-    pub fn get_server_url(&self, key: &str) -> Option<String> {
+    pub fn get_server_url(
+        &self,
+        key: &str,
+    ) -> Option<String> {
         self.servers.get(key).map(|server| server.url.clone())
     }
 
-    pub fn get_credentials(&self, server_name: &str) -> Credentials {
+    pub fn get_credentials(
+        &self,
+        server_name: &str,
+    ) -> Credentials {
         self.servers.get(server_name).unwrap().as_credentials()
     }
 

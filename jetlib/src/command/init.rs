@@ -3,10 +3,14 @@ use crate::{
     error::{ConfigAlreadyExist, JetError},
     git::GitRepo,
     jira::Jira,
-    settings::{private::ProjectSettings, shared::ProjectSettingsShared, GLOBAL_SETTINGS},
+    settings::{
+        internal::InternalSettings,
+        private::ProjectSettings,
+        shared::ProjectSettingsShared,
+        GLOBAL_SETTINGS,
+    },
 };
 use std::{fs::File, io::Write, path::Path};
-use crate::settings::internal::InternalSettings;
 
 /// Init a .jetcli project inside a git repository
 pub struct InitCommand {
@@ -55,7 +59,8 @@ impl JetCommand for InitCommand {
         let settings = toml::to_string(&settings)?;
         let mut file = File::create(".jet/config.toml")?;
 
-        file.write_all(settings.as_bytes()).map_err(JetError::from)?;
+        file.write_all(settings.as_bytes())
+            .map_err(JetError::from)?;
 
         let internal = InternalSettings::default();
         let internal = toml::to_string(&internal)?;
@@ -66,7 +71,10 @@ impl JetCommand for InitCommand {
 }
 
 impl InitCommand {
-    pub fn new(project_name: &str, server_name: Option<&str>) -> InitCommand {
+    pub fn new(
+        project_name: &str,
+        server_name: Option<&str>,
+    ) -> InitCommand {
         InitCommand {
             project_name: project_name.to_string(),
             server_name: server_name.map(|opt| opt.into()),

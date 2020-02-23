@@ -7,7 +7,10 @@ use crate::{command::JetJiraCommand, error::JetError, jira::Jira};
 pub struct ListIssuesCommand;
 
 impl JetJiraCommand for ListIssuesCommand {
-    fn execute(&self, client: &mut Jira) -> Result<(), JetError> {
+    fn execute(
+        &self,
+        client: &mut Jira,
+    ) -> Result<(), JetError> {
         let mut colors = HashMap::new();
         colors.insert("Description :".to_owned(), Color::LightBlue);
         colors.insert("Status :".to_owned(), Color::LightRed);

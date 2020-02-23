@@ -63,7 +63,10 @@ impl Default for GitConfig {
 }
 
 impl ProjectSettingsShared {
-    pub fn create(project_name: &str, server_name: &str) -> ProjectSettingsShared {
+    pub fn create(
+        project_name: &str,
+        server_name: &str,
+    ) -> ProjectSettingsShared {
         let server_url = GLOBAL_SETTINGS.get_server_url(server_name).unwrap();
         let server_name = server_name.into();
         let project_name = project_name.into();

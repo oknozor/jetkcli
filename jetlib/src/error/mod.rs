@@ -14,7 +14,10 @@ pub enum JetError {
 }
 
 impl fmt::Display for JetError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(
+        &self,
+        f: &mut fmt::Formatter,
+    ) -> fmt::Result {
         match *self {
             JetError::ConfigAlreadyExist(ref cause) => {
                 write!(f, "Config already exist : {}", cause)
@@ -109,7 +112,10 @@ impl From<ConfigError> for JetError {
 pub struct ConfigAlreadyExist {}
 
 impl fmt::Display for ConfigAlreadyExist {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(
+        &self,
+        f: &mut fmt::Formatter,
+    ) -> fmt::Result {
         let path = env::current_dir().unwrap();
         write!(f, "Config already exist : {}", path.display())
     }

@@ -17,13 +17,19 @@ impl GitRepo {
         self.repo.workdir()
     }
 
-    pub fn checkout(&self, branch_name: &str) -> Result<(), JetError> {
+    pub fn checkout(
+        &self,
+        branch_name: &str,
+    ) -> Result<(), JetError> {
         self.repo
             .set_head(&format!("refs/heads/{}", branch_name))
             .map_err(|err| err.into())
     }
 
-    pub fn create_and_checkout(&self, branch_name: &str) -> Result<(), JetError> {
+    pub fn create_and_checkout(
+        &self,
+        branch_name: &str,
+    ) -> Result<(), JetError> {
         let mut revwalk = self.repo.revwalk()?;
         revwalk.push_head()?;
         let head = revwalk.last().expect("No HEAD in revwalk");
@@ -34,7 +40,10 @@ impl GitRepo {
         self.checkout(branch_name)
     }
 
-    pub fn commit(&self, message: String) -> Result<(), JetError> {
+    pub fn commit(
+        &self,
+        message: String,
+    ) -> Result<(), JetError> {
         let repo = &self.repo;
         let sig = &self.repo.signature()?;
         let tree_id = &self.repo.index()?.write_tree()?;

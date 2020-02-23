@@ -1,5 +1,5 @@
-use config::{Config, ConfigError, File};
 use crate::git::GitRepo;
+use config::{Config, ConfigError, File};
 use std::collections::HashMap;
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -7,7 +7,7 @@ pub struct InternalSettings {
     // On the first transition transition id is retrieved from the http API
     // After that we store ids in the internal config file to avoid unnecessary http
     // calls
-    pub workflow: HashMap<String, String> // <transition name, transition id>,
+    pub workflow: HashMap<String, String>, // <transition name, transition id>,
 }
 
 impl ToString for InternalSettings {
@@ -19,11 +19,10 @@ impl ToString for InternalSettings {
 impl Default for InternalSettings {
     fn default() -> Self {
         InternalSettings {
-            workflow: Default::default()
+            workflow: Default::default(),
         }
     }
 }
-
 
 impl InternalSettings {
     pub fn get() -> Result<Self, ConfigError> {
@@ -44,7 +43,10 @@ impl InternalSettings {
         }
     }
 
-    pub fn add_workflow(name: &str, id: &str) -> Result<Self, ConfigError> {
+    pub fn add_workflow(
+        name: &str,
+        id: &str,
+    ) -> Result<Self, ConfigError> {
         let repo = GitRepo::open().unwrap();
         let workdir = repo.get_repo_dir().unwrap();
 
@@ -56,12 +58,11 @@ impl InternalSettings {
         let mut s = Config::new();
         s.merge(File::from(path))?;
 
-        let mut workflow: HashMap<String, String> =
-            if let Ok(workflow) = s.get("workflow") {
-                workflow
-            } else {
-                HashMap::new()
-            };
+        let mut workflow: HashMap<String, String> = if let Ok(workflow) = s.get("workflow") {
+            workflow
+        } else {
+            HashMap::new()
+        };
 
         let _ = workflow.insert(name.into(), id.into());
         s.set("workflow", workflow)?;

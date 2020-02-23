@@ -12,7 +12,10 @@ pub trait JetCommand {
 }
 
 pub trait JetJiraCommand {
-    fn execute(&self, client: &mut Jira) -> Result<(), JetError>;
+    fn execute(
+        &self,
+        client: &mut Jira,
+    ) -> Result<(), JetError>;
 }
 
 fn branch_name_to_issue_key(branch_name: &str) -> Option<String> {

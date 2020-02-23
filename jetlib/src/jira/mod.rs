@@ -6,11 +6,7 @@ use search::{Search, *};
 
 pub mod model;
 
-use crate::jira::model::{
-    issue::Issue,
-    response::Transitions,
-    transition::TransitionRequest,
-};
+use crate::jira::model::{issue::Issue, response::Transitions, transition::TransitionRequest};
 use model::{project::Project, response::IssueSearch, ToPage};
 use reqwest::Response;
 
@@ -42,7 +38,10 @@ impl Credentials {
 }
 
 impl Jira {
-    pub fn new(credentials: Credentials, host: &str) -> Jira {
+    pub fn new(
+        credentials: Credentials,
+        host: &str,
+    ) -> Jira {
         let host = host.into();
 
         Jira {
@@ -89,7 +88,10 @@ impl Jira {
             .json()
     }
 
-    pub fn get_project(&self, project_name: &str) -> Result<Project, reqwest::Error> {
+    pub fn get_project(
+        &self,
+        project_name: &str,
+    ) -> Result<Project, reqwest::Error> {
         self.client
             .get(&format!("{}{}/{}", self.host, PROJECT, project_name))
             .basic_auth(&self.credentials.username, self.credentials.pass())
@@ -97,7 +99,10 @@ impl Jira {
             .json()
     }
 
-    pub fn get_issue_by_id(&self, issue_id: &str) -> Result<Issue, reqwest::Error> {
+    pub fn get_issue_by_id(
+        &self,
+        issue_id: &str,
+    ) -> Result<Issue, reqwest::Error> {
         self.client
             .get(&format!("{}{}/{}", self.host, ISSUE, issue_id))
             .basic_auth(&self.credentials.username, self.credentials.pass())
@@ -105,7 +110,10 @@ impl Jira {
             .json()
     }
 
-    pub fn get_transitions(&self, issue_id: &str) -> Result<Transitions, reqwest::Error> {
+    pub fn get_transitions(
+        &self,
+        issue_id: &str,
+    ) -> Result<Transitions, reqwest::Error> {
         self.client
             .get(&format!("{}{}/{}/transitions", self.host, ISSUE, issue_id))
             .basic_auth(&self.credentials.username, self.credentials.pass())
