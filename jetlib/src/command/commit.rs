@@ -15,14 +15,14 @@ impl JetCommand for CommitCommand {
 
         let message = match (&self.scope, issue.as_ref()) {
             (Some(scope), Some(issue)) => format!(
-                "{prefix}({scope}): {message} ({issue})",
+                "{prefix}({scope}): {message} [{issue}]",
                 prefix = &self.prefix,
                 scope = scope,
                 message = &self.message,
                 issue = issue
             ),
             (None, Some(issue)) => format!(
-                "{prefix}: {message} ({issue})",
+                "{prefix}: {message} [{issue}]",
                 prefix = &self.prefix,
                 message = &self.message,
                 issue = issue
