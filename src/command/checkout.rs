@@ -5,8 +5,7 @@ use crate::{
     jira::Jira,
     settings::{internal::InternalSettings, GLOBAL_SETTINGS, PROJECT_SETTINGS_SHARED},
 };
-use reqwest::StatusCode;
-use std::{fs::OpenOptions, io::Write, process};
+use std::{fs::OpenOptions, io::Write};
 
 pub struct CheckoutCommand {
     pub target_issue: String,
@@ -63,29 +62,9 @@ impl JetJiraCommand for CheckoutCommand {
                     in_progress.id.clone()
                 };
 
-            match jira.do_transition(&issue.key, &transition_id)?.status() {
-                StatusCode::NO_CONTENT => (),
-                err_status => {
-                    eprintln!(
-                        "Could not transition Jira issue status code {}",
-                        err_status.as_u16()
-                    );
-                    process::exit(1);
-                }
-            };
-
+            jira.do_transition(&issue.key, &transition_id)?;
             let username = GLOBAL_SETTINGS.current_credentials().username_simple();
-            match jira.assign(&issue.key, &username)?.status() {
-                StatusCode::NO_CONTENT => (),
-                err_status => {
-                    eprintln!(
-                        "Could not assign Jira issue to {} status code {}",
-                        username,
-                        err_status.as_u16()
-                    );
-                    process::exit(1);
-                }
-            };
+            jira.assign(&issue.key, &username)?;
 
             // assign issue
             git.create_and_checkout(&branch_name)?;

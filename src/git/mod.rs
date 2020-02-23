@@ -34,18 +34,19 @@ impl GitRepo {
         let matches: Vec<String> = branches
             .map(|branch| {
                 let branch = branch.unwrap().0;
-                let name = branch.name().unwrap().unwrap().to_owned();
-                name
+                branch.name().unwrap().unwrap().to_owned()
             })
             .filter(|branch_name| branch_name.contains(issue_key))
             .collect();
 
         if matches.is_empty() {
-            Err(JetError::BranchNotFound(issue_key.into()))
+            Err(JetError::BranchNotFound {
+                branch: issue_key.into(),
+            })
         } else if matches.len() == 1 {
             self.checkout(&matches[0])
         } else {
-            Err(JetError::MoreThanOneIssueBranch(matches))
+            Err(JetError::MoreThanOneIssueBranch { branches: matches })
         }
     }
 

@@ -1,6 +1,6 @@
 use crate::{
     command::JetCommand,
-    error::{ConfigAlreadyExist, JetError},
+    error::JetError,
     git::GitRepo,
     jira::Jira,
     settings::{
@@ -81,9 +81,13 @@ impl InitCommand {
         }
     }
 
-    fn maybe_init_already() -> Result<(), ConfigAlreadyExist> {
-        if Path::new("./.jet/config.shared.toml").exists() {
-            Err(ConfigAlreadyExist {})
+    fn maybe_init_already() -> Result<(), JetError> {
+        let str_path = ".jet/config.shared.toml";
+        let path = Path::new(str_path);
+        if path.exists() {
+            Err(JetError::ConfigAlreadyExist {
+                path: str_path.into(),
+            })
         } else {
             Ok(())
         }

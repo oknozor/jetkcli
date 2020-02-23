@@ -1,108 +1,53 @@
 use config::ConfigError;
-use std::{env, error::Error, fmt, io};
+use failure::Fail;
+use std::io;
 
-#[derive(Debug)]
+#[derive(Debug, Fail)]
 pub enum JetError {
-    FileNotFound(io::Error),
-    ConfigError(ConfigError),
-    ConfigAlreadyExist(ConfigAlreadyExist),
-    NotAGitRepository(git2::Error),
-    MoreThanOneIssueBranch(Vec<String>),
-    BranchNotFound(String),
+    #[fail(display = "IO error")]
+    IOError(#[fail(cause)] io::Error),
+
+    #[fail(display = "Config error")]
+    ConfigError(#[fail(cause)] ConfigError),
+
+    #[fail(display = "Git error")]
+    GitError(#[fail(cause)] git2::Error),
+
+    #[fail(display = "Toml error")]
+    TomlError(#[fail(cause)] toml::ser::Error),
+
+    #[fail(display = "Request error")]
+    RequestError(#[fail(cause)] reqwest::Error),
+
+    #[fail(display = "Config file exists : {}", path)]
+    ConfigAlreadyExist { path: String },
+
+    #[fail(display = "More than one matching branch {:?}", branches)]
+    MoreThanOneIssueBranch { branches: Vec<String> },
+    #[fail(display = "No such branch {}", branch)]
+    BranchNotFound { branch: String },
+    #[fail(display = "Git index is empty")]
     EmptyIndex,
-    JiraResourceNotFound(reqwest::Error),
-    TomlError(toml::ser::Error),
-    Other,
-}
 
-impl fmt::Display for JetError {
-    fn fmt(
-        &self,
-        f: &mut fmt::Formatter,
-    ) -> fmt::Result {
-        match *self {
-            JetError::ConfigAlreadyExist(ref cause) => {
-                write!(f, "Config already exist : {}", cause)
-            }
-            JetError::FileNotFound(ref cause) => write!(f, "File not found : {}", cause),
-            JetError::NotAGitRepository(ref cause) => {
-                write!(f, "Current dir is not a git repository : {}", cause)
-            }
-            JetError::EmptyIndex => write!(
-                f,
-                "nothing added to commit but untracked files present (use \"git add\" to track)"
-            ),
-            JetError::JiraResourceNotFound(ref cause) => {
-                write!(f, "Error fetching resource from jira : {}", cause)
-            }
-            JetError::TomlError(ref cause) => {
-                write!(f, "Error during config serialization: {}", cause)
-            }
-            JetError::Other => write!(f, "Unknown Jet error"),
-            JetError::ConfigError(ref cause) => write!(f, "Config error {}", cause),
-            JetError::MoreThanOneIssueBranch(ref branches) => {
-                write!(f, "Found multiple matching branch {:?}", branches)
-            }
-            JetError::BranchNotFound(ref branch) => write!(f, "No such branch {}", branch),
-        }
-    }
-}
-
-impl Error for JetError {
-    fn description(&self) -> &str {
-        match *self {
-            JetError::FileNotFound(ref cause) => cause.description(),
-            JetError::ConfigAlreadyExist(ref cause) => cause.description(),
-            JetError::NotAGitRepository(ref cause) => cause.description(),
-            JetError::EmptyIndex => {
-                "nothing added to commit but untracked files present (use \"git add\" to track)"
-            }
-            JetError::JiraResourceNotFound(ref cause) => cause.description(),
-            JetError::TomlError(ref cause) => cause.description(),
-            JetError::Other => "Unknown .jetcli error!",
-            JetError::ConfigError(ref cause) => cause.description(),
-            JetError::MoreThanOneIssueBranch(_) => "More than one matching branch",
-            JetError::BranchNotFound(_) => "No such branch",
-        }
-    }
-
-    fn cause(&self) -> Option<&dyn Error> {
-        match *self {
-            JetError::FileNotFound(ref cause) => Some(cause),
-            JetError::ConfigAlreadyExist(ref cause) => Some(cause),
-            JetError::NotAGitRepository(ref cause) => Some(cause),
-            JetError::JiraResourceNotFound(ref cause) => Some(cause),
-            JetError::TomlError(ref cause) => Some(cause),
-            JetError::Other => None,
-            JetError::ConfigError(ref cause) => Some(cause),
-            JetError::EmptyIndex => None,
-            JetError::MoreThanOneIssueBranch(_) => None,
-            JetError::BranchNotFound(_) => None,
-        }
-    }
+    #[fail(display = "Http error : {}", status)]
+    HttpError { status: String },
 }
 
 impl From<io::Error> for JetError {
     fn from(cause: io::Error) -> JetError {
-        JetError::FileNotFound(cause)
+        JetError::IOError(cause)
     }
 }
 
 impl From<git2::Error> for JetError {
     fn from(cause: git2::Error) -> JetError {
-        JetError::NotAGitRepository(cause)
+        JetError::GitError(cause)
     }
 }
 
 impl From<reqwest::Error> for JetError {
     fn from(cause: reqwest::Error) -> JetError {
-        JetError::JiraResourceNotFound(cause)
-    }
-}
-
-impl From<ConfigAlreadyExist> for JetError {
-    fn from(cause: ConfigAlreadyExist) -> JetError {
-        JetError::ConfigAlreadyExist(cause)
+        JetError::RequestError(cause)
     }
 }
 
@@ -115,28 +60,5 @@ impl From<toml::ser::Error> for JetError {
 impl From<ConfigError> for JetError {
     fn from(cause: ConfigError) -> JetError {
         JetError::ConfigError(cause)
-    }
-}
-
-#[derive(Debug)]
-pub struct ConfigAlreadyExist {}
-
-impl fmt::Display for ConfigAlreadyExist {
-    fn fmt(
-        &self,
-        f: &mut fmt::Formatter,
-    ) -> fmt::Result {
-        let path = env::current_dir().unwrap();
-        write!(f, "Config already exist : {}", path.display())
-    }
-}
-
-impl Error for ConfigAlreadyExist {
-    fn description(&self) -> &str {
-        "Cannot override existing .jetcli config"
-    }
-
-    fn cause(&self) -> Option<&dyn Error> {
-        Some(&ConfigAlreadyExist {})
     }
 }
