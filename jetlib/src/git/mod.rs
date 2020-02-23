@@ -74,7 +74,6 @@ impl GitRepo {
             let statuses = repo.statuses(None)?;
             statuses.iter().for_each(|status| {
                 eprintln!("{} : {:?}", status.path().unwrap(), status.status());
-                // TODO map status to string
             });
 
             Err(JetError::EmptyIndex)

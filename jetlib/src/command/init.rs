@@ -6,6 +6,7 @@ use crate::{
     settings::{private::ProjectSettings, shared::ProjectSettingsShared, GLOBAL_SETTINGS},
 };
 use std::{fs::File, io::Write, path::Path};
+use crate::settings::internal::InternalSettings;
 
 /// Init a .jetcli project inside a git repository
 pub struct InitCommand {
@@ -54,7 +55,13 @@ impl JetCommand for InitCommand {
         let settings = toml::to_string(&settings)?;
         let mut file = File::create(".jet/config.toml")?;
 
-        file.write_all(settings.as_bytes()).map_err(JetError::from)
+        file.write_all(settings.as_bytes()).map_err(JetError::from)?;
+
+        let internal = InternalSettings::default();
+        let internal = toml::to_string(&internal)?;
+        let mut file = File::create(".jet/config.internal.toml")?;
+
+        file.write_all(internal.as_bytes()).map_err(JetError::from)
     }
 }
 

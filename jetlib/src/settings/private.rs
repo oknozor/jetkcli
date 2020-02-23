@@ -16,7 +16,6 @@ impl ProjectSettings {
     }
 
     pub fn get() -> Result<Self, ConfigError> {
-        // FIXME : handle no repo
         let repo = GitRepo::open().unwrap();
         let workdir = repo.get_repo_dir().unwrap();
         let mut config_path = workdir.to_path_buf();

@@ -124,7 +124,6 @@ fn main() {
                     if let Some(args) = checkout.subcommand_matches(&prefix) {
                         let prefix = prefix.to_owned();
 
-                        // FIXME
                         let target_issue = args.value_of("ISSUE");
                         println!("{:?}", target_issue);
 

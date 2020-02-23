@@ -1,4 +1,3 @@
-// TODO: custom error handling
 use std::io::Result;
 
 pub trait GitHost {

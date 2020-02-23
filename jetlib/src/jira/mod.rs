@@ -9,7 +9,7 @@ pub mod model;
 use crate::jira::model::{
     issue::Issue,
     response::Transitions,
-    transition::{Transition, TransitionRequest},
+    transition::TransitionRequest,
 };
 use model::{project::Project, response::IssueSearch, ToPage};
 use reqwest::Response;
@@ -127,17 +127,5 @@ impl Jira {
             .basic_auth(&self.credentials.username, self.credentials.pass())
             .body(body)
             .send()
-    }
-
-    pub fn do_transition_by_name(
-        &self,
-        issue_id: &str,
-        transition_id: &str,
-    ) -> Result<(), reqwest::Error> {
-        self.client
-            .get(&format!("{}{}/{}/transitions", self.host, ISSUE, issue_id))
-            .basic_auth(&self.credentials.username, self.credentials.pass())
-            .send()?
-            .json()
     }
 }
