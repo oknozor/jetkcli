@@ -2,6 +2,7 @@ use crate::{error::JetError, jira::Jira, settings::PROJECT_SETTINGS_SHARED};
 
 pub mod checkout;
 pub mod commit;
+pub mod status;
 pub mod info;
 pub mod init;
 pub mod issues;

@@ -1,5 +1,5 @@
 use crate::error::JetError;
-use git2::{BranchType, DiffOptions, Object, ObjectType, Repository};
+use git2::{BranchType, DiffOptions, Object, ObjectType, Repository, Commit};
 use std::path::Path;
 
 pub(crate) struct GitRepo {
@@ -49,6 +49,54 @@ impl GitRepo {
             Err(JetError::MoreThanOneIssueBranch { branches: matches })
         }
     }
+
+    pub fn search_commits(&self, term: &str) -> Result<Vec<String>, JetError> {
+        let repo = &self.repo;
+        let mut result = vec![];
+        if let Some(oid) = repo.head()?.target() {
+            let commit = repo.find_commit(oid)?;
+            let matching_commit = &commit.message()
+                .filter(|message| message.contains(term));
+            if let Some(matching_commit) = matching_commit {
+                result.push(self.commit_to_string(&commit));
+                //TODO
+            }
+        }
+        Ok(result)
+    }
+
+
+    fn commit_to_string(&self, commit: &Commit) -> String {
+        let mut output = String::new();
+        output.push_str(&commit.id().to_string()[0..8]);
+
+        if commit.parents().len() > 1 {
+            output.push_str("Merge:");
+            for id in commit.parent_ids() {
+                output.push_str("Merge:");
+                output.push_str(&format!(" {:.8}", id));
+            }
+            output.push('\n');
+        }
+
+        // print_time(&author.when(), "Date:   ");
+        println!();
+
+        for line in String::from_utf8_lossy(commit.message_bytes()).lines() {
+            output.push_str(&format!(" - {}", line));
+        }
+
+        let autho = commit.author();
+        let author_name = autho.name();
+
+        if let Some(name) = author_name {
+            output.push_str(&format!(" - {}", name));
+        }
+
+        output.push('\n');
+        output
+    }
+
 
     pub fn create_and_checkout(
         &self,
