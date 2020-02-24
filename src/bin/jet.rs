@@ -118,7 +118,7 @@ fn main() {
             "checkout" => {
                 let checkout = matches
                     .subcommand_matches("checkout")
-                    .expect("Unable to get checkout subcommands");
+                    .unwrap();
 
                 let settings = ProjectSettingsShared::get().expect("Unable to get shared settings");
 
