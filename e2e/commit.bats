@@ -20,9 +20,37 @@ teardown() {
 }
 
 @test "feature commit works" {
-    echo "add some feature" > file.txt
+    echo "add a nice txt file" > file.txt
     git add .
     run jet feat "this is a feature"
+        [ $status -eq 0 ]
+}
+
+@test "chore commit works" {
+    echo "add " > file.txt
+    git add .
+    run jet chore "some boring stuff"
+        [ $status -eq 0 ]
+}
+
+@test "fix commit works" {
+    echo "add " > file.txt
+    git add .
+    run jet fix "bug fixed"
+        [ $status -eq 0 ]
+}
+
+@test "doc commit works" {
+    echo "add " > file.txt
+    git add .
+    run jet doc "documentation for the win"
+        [ $status -eq 0 ]
+}
+
+@test "style commit works" {
+    echo "add " > file.txt
+    git add .
+    run jet style "this is a stylish"
         [ $status -eq 0 ]
 }
 
