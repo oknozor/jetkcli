@@ -21,6 +21,7 @@ teardown() {
 
 @test "feature commit works" {
     echo "add some feature" > file.txt
+    git add .
     run jet feat "this is a feature"
         [ $status -eq 0 ]
 }

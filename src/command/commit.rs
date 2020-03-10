@@ -28,13 +28,13 @@ impl JetCommand for CommitCommand {
                 issue = issue
             ),
             (Some(scope), None) => format!(
-                "{prefix}({scope}): {message})",
+                "{prefix}({scope}): {message}g",
                 prefix = &self.prefix,
                 scope = scope,
                 message = &self.message,
             ),
             (None, None) => format!(
-                "{prefix}: {message})",
+                "{prefix}: {message}",
                 prefix = &self.prefix,
                 message = &self.message,
             ),
