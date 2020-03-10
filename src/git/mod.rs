@@ -32,13 +32,6 @@ impl GitRepo {
     }
 
     /// Checkout the first matched branch name containing  the input string
-    /// ## Example
-    ///
-    /// Let's say we are on branch `develop` and want to checkout `feat/JET-1`
-    /// ```rust, no_run
-    /// let repo = GitRepo::open();
-    /// repo.find_checkout("JET-1"); // match `feat/JET-1` and checkout
-    /// ```
     pub fn find_checkout(
         &self,
         issue_key: &str,

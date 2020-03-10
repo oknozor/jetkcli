@@ -26,19 +26,6 @@ pub struct CheckoutCommand {
 }
 
 /// Given a Jira issue key, checkout the first matching branch
-/// ## Example :
-///
-/// Assuming we have a branch named feat/JET-1, the following example is
-/// equivalent to `git checkout feat/JET-1`
-///
-/// ```rust, no_run
-/// use jetkcli::command::checkout::SimpleCheckoutCommand;
-/// use jetkcli::command::JetJiraCommand;
-///
-/// SimpleCheckoutCommand {
-///    target_issue: "JET-1".into()
-/// }.execute();
-/// ```
 pub struct SimpleCheckoutCommand {
     pub target_issue: String,
 }
