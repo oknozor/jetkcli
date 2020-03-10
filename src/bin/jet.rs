@@ -9,6 +9,7 @@ use jetkcli::{
         info::InfoCommand,
         init::InitCommand,
         issues::ListIssuesCommand,
+        status::StatusCommand,
         JetCommand,
         JetJiraCommand,
     },
@@ -16,7 +17,6 @@ use jetkcli::{
     settings::{shared::ProjectSettingsShared, GLOBAL_SETTINGS, PROJECT_SETTINGS_SHARED},
 };
 use std::borrow::BorrowMut;
-use jetkcli::command::status::StatusCommand;
 
 fn main() {
     // Generate pre-formatted commit commands
@@ -88,7 +88,10 @@ fn main() {
                 .about("init")
                 .help("Init a jet project inside a git repository"),
         )
-        .subcommand(SubCommand::with_name("status").about("Like git status but with information on the related Jira issue"))
+        .subcommand(
+            SubCommand::with_name("status")
+                .about("Like git status but with information on the related Jira issue"),
+        )
         .subcommand(SubCommand::with_name("issues").about("display all ongoing issues"))
         .subcommand(SubCommand::with_name("info").about("dump info on the current jet project"))
         .get_matches();
@@ -122,14 +125,10 @@ fn main() {
                 let credentials = GLOBAL_SETTINGS.current_credentials();
                 let mut jira = Jira::new(credentials, host);
 
-                StatusCommand::default()
-                    .execute(&mut jira)
-                    .unwrap();
+                StatusCommand::default().execute(&mut jira).unwrap();
             }
             "checkout" => {
-                let checkout = matches
-                    .subcommand_matches("checkout")
-                    .unwrap();
+                let checkout = matches.subcommand_matches("checkout").unwrap();
 
                 let settings = ProjectSettingsShared::get().expect("Unable to get shared settings");
 
@@ -148,7 +147,6 @@ fn main() {
                             let prefix = prefix.to_owned();
 
                             let target_issue = args.value_of("ISSUE");
-                            println!("{:?}", target_issue);
 
                             let target_issue = target_issue
                                 .expect("Expected an issue key as argument")

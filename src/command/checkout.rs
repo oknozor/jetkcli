@@ -7,12 +7,38 @@ use crate::{
 };
 use std::{fs::OpenOptions, io::Write};
 
+/// Create and checkout a branch just like `git checkout -b {branch_name}`
+/// But with a generated prefix, and a jira issue.
+/// When the command is executed the following happen :
+/// - If the transition state is yet unknown write it to the internal config
+/// - Transition the jira issue state to `WIP`
+/// - Assign the user to the issue
+/// - Create a new branch with name `{prefix}{separator}{target_issue_name}
+/// - Checkout the newly created branch
+/// - A warning is printed to stdout if the issue is still assigned to someone
+///   else or unasigned
+///
+/// If the Jira issue can't be found The command will fail while transitioning.
 pub struct CheckoutCommand {
     pub target_issue: String,
     pub prefix: String,
     pub new_branch: bool,
 }
 
+/// Given a Jira issue key, checkout the first matching branch
+/// ## Example :
+///
+/// Assuming we have a branch named feat/JET-1, the following example is
+/// equivalent to `git checkout feat/JET-1`
+///
+/// ```rust, no_run
+/// use jetkcli::command::checkout::SimpleCheckoutCommand;
+/// use jetkcli::command::JetJiraCommand;
+///
+/// SimpleCheckoutCommand {
+///    target_issue: "JET-1".into()
+/// }.execute();
+/// ```
 pub struct SimpleCheckoutCommand {
     pub target_issue: String,
 }

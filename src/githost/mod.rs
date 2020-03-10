@@ -1,5 +1,6 @@
 use std::io::Result;
 
+/// Currently unimplemented
 pub trait GitHost {
     fn submit_pr() -> Result<()>;
     fn edit_pr() -> Result<()>;

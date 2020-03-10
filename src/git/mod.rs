@@ -1,22 +1,27 @@
 use crate::error::JetError;
-use git2::{BranchType, DiffOptions, Object, ObjectType, Repository, Commit};
+use git2::{BranchType, Commit, DiffOptions, Object, ObjectType, Repository};
 use std::path::Path;
 
+/// A Simple wrapper around `git2::Repository` providing high level method to
+/// handle git repo operations.
 pub(crate) struct GitRepo {
     repo: Repository,
 }
 
 impl GitRepo {
+    /// Returns the currently open git repository
     pub fn open() -> Result<GitRepo, git2::Error> {
         let repo = Repository::discover(".")?;
-
         Ok(GitRepo { repo })
     }
 
+    /// Return the working root directory of the current repository
     pub fn get_repo_dir(&self) -> Option<&Path> {
         self.repo.workdir()
     }
 
+    /// checkout an existing git branch
+    /// panics if the current directory is not in a git repository
     pub fn checkout(
         &self,
         branch_name: &str,
@@ -26,6 +31,14 @@ impl GitRepo {
             .map_err(|err| err.into())
     }
 
+    /// Checkout the first matched branch name containing  the input string
+    /// ## Example
+    ///
+    /// Let's say we are on branch `develop` and want to checkout `feat/JET-1`
+    /// ```rust, no_run
+    /// let repo = GitRepo::open();
+    /// repo.find_checkout("JET-1"); // match `feat/JET-1` and checkout
+    /// ```
     pub fn find_checkout(
         &self,
         issue_key: &str,
@@ -50,14 +63,18 @@ impl GitRepo {
         }
     }
 
-    pub fn search_commits(&self, term: &str) -> Result<Vec<String>, JetError> {
+    /// Given an input string, return a list string representing the matching
+    /// commit messages.
+    pub fn search_commits(
+        &self,
+        term: &str,
+    ) -> Result<Vec<String>, JetError> {
         let repo = &self.repo;
         let mut result = vec![];
         if let Some(oid) = repo.head()?.target() {
             let commit = repo.find_commit(oid)?;
-            let matching_commit = &commit.message()
-                .filter(|message| message.contains(term));
-            if let Some(matching_commit) = matching_commit {
+            let matching_commit = &commit.message().filter(|message| message.contains(term));
+            if let Some(_matching_commit) = matching_commit {
                 result.push(self.commit_to_string(&commit));
                 //TODO
             }
@@ -65,8 +82,11 @@ impl GitRepo {
         Ok(result)
     }
 
-
-    fn commit_to_string(&self, commit: &Commit) -> String {
+    /// Pretty print commits, think of it as `git log`
+    fn commit_to_string(
+        &self,
+        commit: &Commit,
+    ) -> String {
         let mut output = String::new();
         output.push_str(&commit.id().to_string()[0..8]);
 
@@ -86,8 +106,8 @@ impl GitRepo {
             output.push_str(&format!(" - {}", line));
         }
 
-        let autho = commit.author();
-        let author_name = autho.name();
+        let author = commit.author();
+        let author_name = author.name();
 
         if let Some(name) = author_name {
             output.push_str(&format!(" - {}", name));
@@ -97,7 +117,8 @@ impl GitRepo {
         output
     }
 
-
+    /// Create a new branch with the given `branch_name` and perform a checkout.
+    /// Just like `git checkout -b {branch_name}`
     pub fn create_and_checkout(
         &self,
         branch_name: &str,
@@ -112,6 +133,7 @@ impl GitRepo {
         self.checkout(branch_name)
     }
 
+    /// Create a new commit with the given commit message
     pub fn commit(
         &self,
         message: String,
@@ -160,6 +182,7 @@ impl GitRepo {
             Err(JetError::EmptyIndex)
         }
     }
+
     pub fn get_current_branch_name(&self) -> Result<String, JetError> {
         let head = &self.repo.head()?;
         let head = head.shorthand();
