@@ -5,10 +5,10 @@ setup() {
     git add file.md;
     git commit -m "chore: init test repository";
     echo '
-[servers.local]
-url = "http://localhost:8080"
-username = "paul.delafosse"
-password = "caca1000"
+[servers.test]
+url = "$JIRA_SERVER_URL"
+username = "$JIRA_USER"
+password = "$JIRA_PASSWORD"
 ' > $HOME/.config/jet/config.toml;
 }
 
@@ -34,7 +34,7 @@ teardown() {
 }
 
 @test "shall init jet config files" {
-    run jet init -p DUM --server "local"
+    run jet init -p JETKCLI --server "test"
         [ $status -eq 0 ]
         [ -e .jet ]
         [ -f .jet/config.toml ]
@@ -43,7 +43,7 @@ teardown() {
 
 
 @test "shall init jet config with implicit server arg" {
-    run jet init -p DUM
+    run jet init -p JETKCLI
         [ $status -eq 0 ]
         [ -e .jet ]
         [ -f .jet/config.toml ]
